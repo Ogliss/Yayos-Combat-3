@@ -24,7 +24,7 @@ namespace yayoCombat
 
             if (stance_Busy != null)
             {
-                Log.Message((Offhand ? "Offhand" : "Mainhand") + " " + pawn.Rotation.ToStringHuman());
+            //  Log.Message((Offhand ? "Offhand" : "Mainhand") + " " + pawn.Rotation.ToStringHuman());
             }
             bool flag = true;
             if (pawn.CurJob != null && pawn.CurJob.def.neverShowWeapon) flag = false;

@@ -62,8 +62,11 @@ namespace yayoCombat
                 x = -0.05f;
             }
             // 주무기 // Mainhand
-            Stance_Busy stance_Busy = pawn.stances.curStance as Stance_Busy;
-            PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, pawn.equipment.Primary, stance_Busy, new Vector3(-x, y, -z));
+            if (pawn.equipment.Primary != offHandEquip)
+            {
+                Stance_Busy stance_Busy = pawn.stances.curStance as Stance_Busy;
+                PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, pawn.equipment.Primary, stance_Busy, new Vector3(-x, y, -z));
+            }
             // 보조무기 // Offhand
             if (offHandEquip != null)
             {
