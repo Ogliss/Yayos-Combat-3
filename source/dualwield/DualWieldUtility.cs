@@ -9,7 +9,7 @@ using Verse;
 
 namespace yayoCombat
 {
-    static class dualWield_etc
+    static class DualWieldUtility
     {
         public static bool TryGetOffHandEquipment(this Pawn_EquipmentTracker instance, out ThingWithComps result)
         {

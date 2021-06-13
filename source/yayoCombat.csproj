@@ -17,7 +17,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.2\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -57,16 +57,15 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="amor\BodyPartGroupDefOf.cs" />
+    <Compile Include="defOf\BodyPartGroupDefOf.cs" />
     <Compile Include="animation\patch_DrawEquipment.cs" />
     <Compile Include="animation\PawnRenderer_override.cs" />
     <Compile Include="defOf\ApparelLayerDefOf.cs" />
     <Compile Include="defOf\ThingCategoryDefOf.cs" />
-    <Compile Include="dualwield\dualWield_etc.cs" />
-    <Compile Include="ext\Ext_Pawn_EquipmentTracker.cs" />
+    <Compile Include="dualwield\DualWieldUtility.cs" />
     <Compile Include="defOf\JobDefOf.cs" />
     <Compile Include="melee\patch_Thing.cs" />
-    <Compile Include="animation\patch_PawnRenderer.cs" />
+    <Compile Include="animation\patch_DrawEquipmentAiming.cs" />
     <Compile Include="melee\patch_Tool.cs" />
     <Compile Include="amor\patch_DamageWorker_AddInjury.cs" />
     <Compile Include="0_core\patch_DamageWorker.cs" />

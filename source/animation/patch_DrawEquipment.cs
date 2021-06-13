@@ -2,7 +2,6 @@
 using HarmonyLib;
 using Verse;
 
-
 namespace yayoCombat
 {
     [HarmonyPatch(typeof(PawnRenderer), "DrawEquipment")]
@@ -54,11 +53,18 @@ namespace yayoCombat
                 */
             }
 
-            // 주무기
+            float y = 0.0005f;
+            float x = 0.1f;
+            float z = 0.1f;
+            if (pawn.Rotation == Rot4.West)
+            {
+                y = -0.1f + -0.3787879f;
+                x = -0.05f;
+            }
+            // 주무기 // Mainhand
             Stance_Busy stance_Busy = pawn.stances.curStance as Stance_Busy;
-            PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, pawn.equipment.Primary, stance_Busy, new Vector3(0f, 0f, 0.0005f));
-
-            // 보조무기
+            PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, pawn.equipment.Primary, stance_Busy, new Vector3(-x, y, -z));
+            // 보조무기 // Offhand
             if (offHandEquip != null)
             {
                 Stance_Busy offHandStance = null;
@@ -66,7 +72,17 @@ namespace yayoCombat
                 {
                     offHandStance = pawn.GetStancesOffHand().curStance as Stance_Busy;
                 }
-                PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, offHandEquip, offHandStance, new Vector3(0.1f, 0.1f, 0f), true);
+                if (pawn.Rotation == Rot4.East)
+                {
+                    y = -0.05f + -0.3787879f;
+                }
+                else
+                if (pawn.Rotation == Rot4.West)
+                {
+                    y = 0.05f;
+                }
+                else y = 0f;
+                PawnRenderer_override.animateEquip(__instance, pawn, rootLoc, offHandEquip, offHandStance, new Vector3(x, y, z), true);
             }
 
             return false;

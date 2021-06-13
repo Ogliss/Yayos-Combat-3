@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "d7KCfxiz9flCBY2AgaKrFQhwm9L6pKckzoEXVpMoKNkDIdVlfF6H58SCAKuTFyzL8HZGByjlMsNGMW1Rif6vBQ==",
+  "dgSpecHash": "29o00bXuxllmGPMlzOwm8/ykhK3wd8lCL6nzJQQ6uPKeIk5I/ctzHzdmgChkFCkV/vT9XGA9aSu+lVwUmE8oNA==",
   "success": true,
-  "projectFilePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\YayosCombat\\source\\yayoCombat.csproj",
+  "projectFilePath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\source\\yayoCombat.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\User\\.nuget\\packages\\krafs.rimworld.ref\\1.2.2905\\krafs.rimworld.ref.1.2.2905.nupkg.sha512",
     "C:\\Users\\User\\.nuget\\packages\\lib.harmony\\2.0.4\\lib.harmony.2.0.4.nupkg.sha512",

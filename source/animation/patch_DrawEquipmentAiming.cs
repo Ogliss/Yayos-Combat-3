@@ -8,9 +8,8 @@ using System.Linq;
 
 namespace yayoCombat
 {
-
     [HarmonyPatch(typeof(PawnRenderer), "DrawEquipmentAiming")]
-    internal class patch_DrawEquipmentAiming
+    public static class patch_DrawEquipmentAiming
     {
 
         [HarmonyPrefix]
@@ -80,20 +79,31 @@ namespace yayoCombat
                     num += eq.def.equippedAngleOffset;
                 }
             }
-            
-            if (yayoCombat.using_dualWeld)
+            if (pawn.Rotation == Rot4.West || pawn.Rotation == Rot4.East)
             {
-                if (pawn.equipment.TryGetOffHandEquipment(out ThingWithComps result))
+                if (yayoCombat.using_dualWeld && !isMeleeAtk)
                 {
-                    if (eq == result && (pawn.Rotation == Rot4.West || pawn.Rotation == Rot4.East))
+                    if (pawn.equipment.TryGetOffHandEquipment(out ThingWithComps result))
                     {
-                        if (mesh == MeshPool.plane10Flip)
+                        if (eq == result)
                         {
-                            mesh = MeshPool.plane10;
-                        }
-                        else
-                        {
-                            mesh = MeshPool.plane10Flip;
+                            Stance_Busy offHandStance = null;
+                            if (pawn.GetStancesOffHand() != null)
+                            {
+                                offHandStance = pawn.GetStancesOffHand().curStance as Stance_Busy;
+                            }
+                            bool flag2 = offHandStance != null && !offHandStance.neverAimWeapon && offHandStance.focusTarg.IsValid;
+                            if (!flag2)
+                            {
+                                if (mesh == MeshPool.plane10Flip)
+                                {
+                                    mesh = MeshPool.plane10;
+                                }
+                                else
+                                {
+                                    mesh = MeshPool.plane10Flip;
+                                }
+                            }
                         }
                     }
                 }
