@@ -84,8 +84,8 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DualWield">
-      <HintPath>..\..\..\..\..\workshop\content\294100\1628211313\1.1\Assemblies\DualWield.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>_DLL\publicized_assemblies\DualWield_publicized.dll</HintPath>
+      <Private>false</Private>
     </Reference>
     <Reference Include="System">
       <Private>False</Private>

@@ -7,9 +7,10 @@ namespace yayoCombat
     static public class PawnRenderer_override
     {
         // PawnRenderer_override.DrawEquipmentAiming
-        public static void DrawEquipmentAiming(this PawnRenderer instance, Thing eq, Vector3 drawLoc, float aimAngle, Pawn pawn, Stance_Busy stance_Busy = null, bool Offhand = false)
+        public static void DrawEquipmentAiming(this PawnRenderer instance, Thing eq, Vector3 drawLoc, float aimAngle, Pawn pawn, Stance_Busy stance_Busy = null, bool pffhand = false)
         {
             Pawn p = pawn;
+            bool Offhand = false;
             if (!yayoCombat.advAni)
             {
                 instance.DrawEquipmentAiming(eq, drawLoc, aimAngle);
@@ -93,7 +94,7 @@ namespace yayoCombat
             return;
         }
 
-        static public void animateEquip(PawnRenderer __instance, Pawn pawn, Vector3 rootLoc, ThingWithComps thing, Stance_Busy stance_Busy, Vector3 offset, bool isSub = false, Stance_Busy offHandStance = null)
+        static public void animateEquip(PawnRenderer __instance, Pawn pawn, Vector3 rootLoc, float num, ThingWithComps thing, Stance_Busy stance_Busy, Vector3 offset, bool isSub = false)
         {
             Vector3 rootLoc2 = rootLoc;
             bool isMechanoid = pawn.RaceProps.IsMechanoid;
@@ -207,8 +208,6 @@ namespace yayoCombat
                         }
                     }
 
-                    Vector3 a;
-                    float num = GetAimingRotation(pawn, stance_Busy.focusTarg);
                     Vector3 drawLoc = Vector3.zero;
 
                     if (pawn.Rotation == Rot4.West)
@@ -229,22 +228,22 @@ namespace yayoCombat
                     float reboundFactor = 70f;
                     if (pawn.Rotation == Rot4.South)
                     {
-                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn, stance_Busy, isSub);
+                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num - ani * reboundFactor - addAngle });
                     }
                     if (pawn.Rotation == Rot4.North)
                     {
-                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn, stance_Busy, isSub);
+                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num - ani * reboundFactor - addAngle });
                     }
                     if (pawn.Rotation == Rot4.East)
                     {
-                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn, stance_Busy, isSub);
+                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num - ani * reboundFactor - addAngle });
                     }
                     if (pawn.Rotation == Rot4.West)
                     {
-                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn, stance_Busy, isSub);
+                        __instance.DrawEquipmentAiming(thing, drawLoc, num - ani * reboundFactor - addAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num + ani * reboundFactor + addAngle });
                     }
                     return;
@@ -281,13 +280,13 @@ namespace yayoCombat
                         addAngle -= 35f;
                     }
                     //if (log) Log.Message("D");
-                    float readyZ = isSub && pawn.Rotation == Rot4.West  ? 0.4f : 0.2f;
+                    float readyZ = isSub && pawn.Rotation == Rot4.West  ?- 0.2f : 0.2f;
                     //if (log) Log.Message("E");
-                    if (stance_Busy.ticksLeft > 15)
+                    float num2 = GetAimingRotation(pawn, stance_Busy.focusTarg);
+                    if (stance_Busy.ticksLeft > 0)
                     {
                         //if (log) Log.Message("F");
                         // 애니메이션 // animation
-                        float num = GetAimingRotation(pawn, stance_Busy.focusTarg);
                         float ani = Mathf.Min((float)stance_Busy.ticksLeft, 60f);
                         float ani2 = ani * 0.0075f; // 0.45f -> 0f
                         float addZ = offset.x;
@@ -323,58 +322,57 @@ namespace yayoCombat
                         // 캐릭터 방향에 따라 적용 // Applied according to character orientation
                         if (pawn.Rotation == Rot4.South)
                         {
-                            Vector3 drawLoc = rootLoc2 + new Vector3(-addX, offset.y, addZ).RotatedBy(num);
+                            Vector3 drawLoc = rootLoc2 + new Vector3(-addX, offset.y, addZ).RotatedBy(num2);
                             if (offset.y >= 0f)
                             {
                                 drawLoc.y += 0.03787879f;
                             }
-                            num += addAngle;
-                            __instance.DrawEquipmentAiming(thing, drawLoc, num + ani, pawn, stance_Busy, isSub);
+                            num2 += addAngle;
+                            __instance.DrawEquipmentAiming(thing, drawLoc, num+ ani, pawn);//, stance_Busy, isSub);
                             //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num + ani });
                         }
                         if (pawn.Rotation == Rot4.North)
                         {
-                            Vector3 drawLoc = rootLoc2 + new Vector3(-addX, offset.y, addZ).RotatedBy(num);
+                            Vector3 drawLoc = rootLoc2 + new Vector3(-addX, offset.y, addZ).RotatedBy(num2);
                             if (offset.y >= 0f)
                             {
                                 drawLoc.y += 0.03787879f;
                             }
-                            num += addAngle;
-                            __instance.DrawEquipmentAiming(thing, drawLoc, num + ani, pawn, stance_Busy, isSub);
+                            num2 += addAngle;
+                            __instance.DrawEquipmentAiming(thing, drawLoc, num + ani, pawn);//, stance_Busy, isSub);
                             //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num + ani });
                         }
                         if (pawn.Rotation == Rot4.East)
                         {
-                            Vector3 drawLoc = rootLoc2 + new Vector3(addX, offset.y, addZ).RotatedBy(num);
+                            Vector3 drawLoc = rootLoc2 + new Vector3(addX, offset.y, addZ).RotatedBy(num2);
                             if (offset.y >= 0f)
                             {
                                 drawLoc.y += 0.03787879f;
                             }
-                            num += addAngle;
-                            __instance.DrawEquipmentAiming(thing, drawLoc, num + ani, pawn, stance_Busy, isSub);
+                            num2 += addAngle;
+                            __instance.DrawEquipmentAiming(thing, drawLoc, num2 + ani, pawn);//, stance_Busy, isSub);
                             //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num + ani });
                         }
                         if (pawn.Rotation == Rot4.West)
                         {
-                            Vector3 drawLoc = rootLoc2 + new Vector3(-addX, offset.y, addZ).RotatedBy(num);
+                            Vector3 drawLoc = rootLoc2 + new Vector3(addX, offset.y, addZ).RotatedBy(num2);
                             if (offset.y >= 0f)
                             {
                                 drawLoc.y += 0.03787879f;
                             }
-                            num -= addAngle;
-                            __instance.DrawEquipmentAiming(thing, drawLoc, num + ani, pawn, stance_Busy, isSub);
+                            num2 -= addAngle;
+                            __instance.DrawEquipmentAiming(thing, drawLoc, num2 + ani, pawn);//, stance_Busy, isSub);
                             //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num - ani });
                         }
                     }
                     else
                     {
-                        float num = GetAimingRotation(pawn, stance_Busy.focusTarg);
                         Vector3 drawLoc = rootLoc2 + new Vector3(isSub && pawn.Rotation == Rot4.West ? -0.2f : 0.0f, offset.y, readyZ).RotatedBy(num);
                         if (offset.y >= 0f)
                         {
                             drawLoc.y += 0.03787879f;
                         }
-                        __instance.DrawEquipmentAiming(thing, drawLoc, num, pawn, stance_Busy, isSub);
+                        __instance.DrawEquipmentAiming(thing, drawLoc, num, pawn);//, stance_Busy, isSub);
                         //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc, num });
                     }
                     return;
@@ -424,89 +422,88 @@ namespace yayoCombat
                 if (pawn.Rotation == Rot4.South)
                 {
                     Vector3 drawLoc2 = Vector3.zero;
-                    float angle = 143f;
+                    float angle = num; //143f;
                     if (!isSub)
                     {
                         drawLoc2 = rootLoc2 + new Vector3(0f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 143f;
+                        //    angle = 143f;
                     }
                     else
                     {
                         drawLoc2 = rootLoc2 + new Vector3(0f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 350f - 143f;
+                        angle = 350f - num;
                         aniAngle *= -1f;
                     }
                     if (offset.y >= 0f)
                     {
                         drawLoc2.y += 0.03787879f;
                     }
-                    __instance.DrawEquipmentAiming(thing, drawLoc2, addAngle + angle + wiggle * aniAngle, pawn, stance_Busy, isSub);
+                    __instance.DrawEquipmentAiming(thing, drawLoc2, addAngle + angle + wiggle * aniAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc2, addAngle + angle + wiggle * aniAngle });
                     return;
                 }
                 if (pawn.Rotation == Rot4.North)
                 {
                     Vector3 drawLoc3 = Vector3.zero;
-                    float angle = 143f;
+                    float angle = num; //143f;
                     if (!isSub)
                     {
                         drawLoc3 = rootLoc2 + new Vector3(0f, offset.y, -0.11f + wiggle * 0.05f);
-                        angle = 143f;
+                        //    angle = 143f;
                     }
                     else
                     {
                         drawLoc3 = rootLoc2 + new Vector3(0f, offset.y, -0.11f + wiggle * 0.05f);
-                        angle = 350f - 143f;
+                        angle = 350f - num;
                         aniAngle *= -1f;
                     }
                     drawLoc3.y += 0f;
-                    __instance.DrawEquipmentAiming(thing, drawLoc3, addAngle + angle + wiggle * aniAngle, pawn, stance_Busy, isSub);
+                    __instance.DrawEquipmentAiming(thing, drawLoc3, addAngle + angle + wiggle * aniAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc3, addAngle + angle + wiggle * aniAngle });
                     return;
                 }
                 if (pawn.Rotation == Rot4.East)
                 {
                     Vector3 drawLoc4 = Vector3.zero;
-                    float angle = 143f;
+                    float angle = num; //143f;
                     if (!isSub)
                     {
                         drawLoc4 = rootLoc2 + new Vector3(0.2f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 143f;
+                        //    angle = 143f;
                     }
                     else
                     {
                         drawLoc4 = rootLoc2 + new Vector3(0.2f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 350f - 143f;
                         aniAngle *= -1f;
                     }
                     if (offset.y >= 0f)
                     {
                         drawLoc4.y += 0.03787879f;
                     }
-                    __instance.DrawEquipmentAiming(thing, drawLoc4, addAngle + angle + wiggle * aniAngle, pawn, stance_Busy, isSub);
+                    __instance.DrawEquipmentAiming(thing, drawLoc4, addAngle + angle + wiggle * aniAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc4, addAngle + angle + wiggle * aniAngle });
                     return;
                 }
                 if (pawn.Rotation == Rot4.West)
                 {
                     Vector3 drawLoc5 = Vector3.zero;
-                    float angle = 217f;
+                    float angle = 350f - num; //217f;
                     if (!isSub)
                     {
                         drawLoc5 = rootLoc2 + new Vector3(-0.2f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 217f;
+                    //    angle = 217f;
                     }
                     else
                     {
                         drawLoc5 = rootLoc2 + new Vector3(-0.2f, offset.y, -0.22f + wiggle * 0.05f);
-                        angle = 350f - 217f;
+                    //    angle = 350f - num;
                         aniAngle *= -1f;
                     }
                     if (offset.y >= 0f)
                     {
                         drawLoc5.y += 0.03787879f;
                     }
-                    __instance.DrawEquipmentAiming(thing, drawLoc5, addAngle + angle + wiggle * aniAngle, pawn, stance_Busy, isSub);
+                    __instance.DrawEquipmentAiming(thing, drawLoc5, addAngle + angle + wiggle * aniAngle, pawn);//, stance_Busy, isSub);
                     //    AccessTools.Method(typeof(PawnRenderer), "DrawEquipmentAiming").Invoke(__instance, new object[] { thing, drawLoc5, addAngle + angle + wiggle * aniAngle });
                     return;
                 }
@@ -515,7 +512,7 @@ namespace yayoCombat
         }
 
 
-        private static float GetAimingRotation(Pawn pawn, LocalTargetInfo focusTarg)
+        internal static float GetAimingRotation(Pawn pawn, LocalTargetInfo focusTarg)
         {
             Vector3 a;
             if (focusTarg.HasThing)
@@ -534,11 +531,11 @@ namespace yayoCombat
 
             return num;
         }
-        private static bool CurrentlyAiming(Stance_Busy stance)
+        internal static bool CurrentlyAiming(Stance_Busy stance)
         {
             return (stance != null && !stance.neverAimWeapon && stance.focusTarg.IsValid);
         }
-        private static bool IsMeleeWeapon(ThingWithComps eq)
+        internal static bool IsMeleeWeapon(ThingWithComps eq)
         {
             if (eq == null)
             {

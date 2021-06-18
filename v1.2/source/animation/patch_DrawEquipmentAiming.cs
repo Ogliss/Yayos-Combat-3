@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace yayoCombat
 {
-    [HarmonyPatch(typeof(PawnRenderer), "DrawEquipmentAiming")]
+//    [HarmonyPatch(typeof(PawnRenderer), "DrawEquipmentAiming")]
     public static class patch_DrawEquipmentAiming
     {
 
