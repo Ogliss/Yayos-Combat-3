@@ -1,0 +1,79 @@
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\Assemblies\yayoCombat.dll
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\Assemblies\yayoCombat.pdb
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.dll
+F:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\v1.1\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\v1.1\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\lt_source\obj\Debug\yayoCombat.csproj.CopyComplete
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\v1.1\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\v1.1\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\lt_source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\lt_source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\lt_source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods(backup)\Yayo Combat\lt_source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 2\source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat\source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 4\source\obj\Debug\yayoCombat.pdb
+D:\v1.2\Assemblies\yayoCombat.dll
+D:\v1.2\Assemblies\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo Combat 3\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\source\obj\Debug\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\source\obj\Debug\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\yayoCombat.pdb
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\v1.2\Assemblies\yayoCombat.dll
+D:\SteamLibrary\steamapps\common\RimWorld\Mods\Yayo's Combat 3\v1.2\Assemblies\yayoCombat.pdb
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\v1.2\Assemblies\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\v1.2\Assemblies\yayoCombat.pdb
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.csproj.CopyComplete
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.AssemblyInfoInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\obj\Debug\yayoCombat.AssemblyInfo.cs
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\bin\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\YayosCombat\source\bin\Debug\0Harmony.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\bin\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\bin\Debug\0Harmony.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.AssemblyInfoInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.AssemblyInfo.cs
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.csproj.CopyComplete
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.2\Assemblies\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.AssemblyInfoInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.AssemblyInfo.cs
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\Assemblies\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.3\source\obj\Debug\yayoCombat.csproj.CopyComplete
