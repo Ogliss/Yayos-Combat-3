@@ -17,7 +17,7 @@
     <DebugSymbols>false</DebugSymbols>
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.2\Assemblies\</OutputPath>
+    <OutputPath>..\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Assemblies\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -117,6 +117,9 @@
     <ItemGroup>
       <Reference Remove="$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll" />
     </ItemGroup>
+  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&#xD;&#xA;      call &quot;$(SolutionDir)\Scripts\ModCopy 1.2.bat&quot;&#xD;&#xA;      call :REPORT_ERRORLEVEL&#xD;&#xA;      goto :EOF&#xD;&#xA;&#xD;&#xA;      :REPORT_ERRORLEVEL&#xD;&#xA;      echo.&#xD;&#xA;      if ERRORLEVEL 16 echo ***FATAL ERROR*** &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 8 echo **FAILED COPIES** &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 4 echo *MISMATCHES* &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 2 echo EXTRA FILES &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 1 echo Copy successful &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 0 echo –no change– &amp; goto :EOF&#xD;&#xA;" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

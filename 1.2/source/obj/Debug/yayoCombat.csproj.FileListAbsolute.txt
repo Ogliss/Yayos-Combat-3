@@ -70,3 +70,10 @@ C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\sourc
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.csproj.CopyComplete
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\source\obj\Debug\yayoCombat.dll
 C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\v1.2\Assemblies\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.csprojAssemblyReference.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.AssemblyInfoInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.AssemblyInfo.cs
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.csproj.CoreCompileInputs.cache
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.csproj.CopyComplete
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\source\obj\Debug\yayoCombat.dll
+C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\Yayos-Combat-3\1.2\Assemblies\yayoCombat.dll
