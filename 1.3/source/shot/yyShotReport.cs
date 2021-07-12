@@ -106,7 +106,7 @@ namespace yayoCombat
 
 					// yayo
 					
-					bool isEquip = (__instance.EquipmentSource != null) && (__instance.EquipmentSource.def.equipmentType != null);
+					bool isEquip = (__instance.EquipmentSource != null) && (__instance.EquipmentSource.def.equipmentType != EquipmentType.None);
 
 					float missR = (1f - shotReport.AimOnTargetChance_IgnoringPosture * 0.5f);
                     if (missR < 0f) missR = 0f;

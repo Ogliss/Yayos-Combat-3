@@ -104,7 +104,7 @@ namespace yayoCombat
                 BodyPartRecord bodyPartRecord = ChooseHitPart(dinfo, pawn);
                 if (bodyPartRecord == null)
                 {
-                    Log.Warning("ChooseHitPart returned null (any part).", false);
+                    Log.Warning("ChooseHitPart returned null (any part).");
                 }
                 return bodyPartRecord;
             }
@@ -157,7 +157,7 @@ namespace yayoCombat
                         hediffDefFromDamage,
                         " on ",
                         pawn
-                    }), false);
+                    }));
                 }
             }
             return FinalizeAndAddInjury(pawn, hediff_Injury, dinfo, result);
@@ -171,7 +171,7 @@ namespace yayoCombat
                 hediffComp_GetsPermanent.PreFinalizeInjury();
             }
             float partHealth = pawn.health.hediffSet.GetPartHealth(injury.Part);
-            if (pawn.IsColonist && !dinfo.IgnoreInstantKillProtection && dinfo.Def.ExternalViolenceFor(pawn) && !Rand.Chance(Find.Storyteller.difficultyValues.allowInstantKillChance))
+            if (pawn.IsColonist && !dinfo.IgnoreInstantKillProtection && dinfo.Def.ExternalViolenceFor(pawn) && !Rand.Chance(Find.Storyteller.difficulty.allowInstantKillChance))
             {
                 float num = (injury.def.lethalSeverity > 0f) ? (injury.def.lethalSeverity * 1.1f) : 1f;
                 float min = 1f;
@@ -190,7 +190,7 @@ namespace yayoCombat
                             injury.Severity,
                             num3,
                             partHealth
-                        }), false);
+                        }));
                     }
                     injury.Severity = num3;
                     num *= 2f;

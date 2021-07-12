@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FC41E232-A864-437B-8A66-32A408DC6EB1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>yayoCombat</RootNamespace>
+    <AssemblyName>yayoCombat</AssemblyName>
+    <TargetFramework>net472</TargetFramework>
+    <FileAlignment>512</FileAlignment>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>false</DebugSymbols>
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>8.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\Assemblies\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="MigrationBackup\**" />
+    <EmbeddedResource Remove="_DLL\**" />
+    <None Remove="MigrationBackup\**" />
+    <None Remove="_DLL\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.2.2905" GeneratePathProperty="true" />
+    <PackageReference Include="Lib.Harmony">
+      <Version>2.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="UnlimitedHugs.Rimworld.HugsLib">
+      <Version>8.0.0</Version>
+      <ExcludeAssets>runtime</ExcludeAssets>
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="TaskPubliciser">
+      <Version>1.0.3</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DefOf\BodyPartGroupDefOf.cs" />
+    <Compile Include="Harmony\Patches\Animation\PawnRenderer_DrawEquipment.cs" />
+    <Compile Include="Utilities\PawnRenderer_override.cs" />
+    <Compile Include="DefOf\ApparelLayerDefOf.cs" />
+    <Compile Include="DefOf\ThingCategoryDefOf.cs" />
+    <Compile Include="Utilities\DualWieldUtility.cs" />
+    <Compile Include="DefOf\JobDefOf.cs" />
+    <Compile Include="Harmony\Patches\DefGenerator_GenerateImpliedDefs_PreResolve.cs" />
+    <Compile Include="Harmony\Patches\Loadout\DrugPolicy_ExposeData.cs" />
+    <Compile Include="Harmony\Patches\Loadout\DrugPolicy_InitializeIfNeeded.cs" />
+    <Compile Include="Harmony\Patches\Loadout\JobGiver_MoveDrugsToInventory_FindDrugFor.cs" />
+    <Compile Include="Harmony\Patches\Loadout\Pawn_DrugPolicyTracker_AllowedToTakeToInventory.cs" />
+    <Compile Include="Harmony\Patches\Melee\Pawn_MeleeVerbs_ChooseMeleeVerb.cs" />
+    <Compile Include="Harmony\Patches\Melee\Thing_TakeDamage.cs" />
+    <Compile Include="Harmony\Patches\Animation\PawnRenderer_DrawEquipmentAiming.cs" />
+    <Compile Include="Harmony\Patches\Melee\Tool_AdjustedCooldown.cs" />
+    <Compile Include="Harmony\Patches\patch_DamageWorker_AddInjury.cs" />
+    <Compile Include="Harmony\Patches\Reloading\Building_TurretGun_MakeGun.cs" />
+    <Compile Include="Harmony\Patches\Reloading\CompReloadable_CreateVerbTargetCommand.cs" />
+    <Compile Include="Harmony\Patches\Reloading\CompReloadable_PostExposeData.cs" />
+    <Compile Include="Harmony\Patches\Reloading\CompReloadable_PostPostMake.cs" />
+    <Compile Include="Harmony\Patches\Reloading\CompReloadable_UsedOnce.cs" />
+    <Compile Include="Harmony\Patches\Reloading\PawnWeaponGenerator_TryGenerateWeaponFor.cs" />
+    <Compile Include="Harmony\Patches\Reloading\Pawn_EquipmentTracker_DropAllEquipment.cs" />
+    <Compile Include="Harmony\Patches\Reloading\Pawn_EquipmentTracker_GetGizmos.cs" />
+    <Compile Include="Harmony\Patches\Reloading\Pawn_TickRare.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ReloadableUtility_FindPotentiallyReloadableGear.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ReloadableUtility_FindSomeReloadableComponent.cs" />
+    <Compile Include="Harmony\Patches\Reloading\StatPart_ReloadMarketValue_TransformAndExplain.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ThingFilter_SetFromPreset.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ThingSetMaker_TraderStock_Generate.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ThingWithComps_GetFloatMenuOptions.cs" />
+    <Compile Include="Harmony\Patches\Reloading\TraderKindDef_WillTrade.cs" />
+    <Compile Include="Harmony\Patches\Reloading\WorkGiver_HasHuntingWeapon.cs" />
+    <Compile Include="Harmony\Patches\patch_DamageWorker.cs" />
+    <Compile Include="yayoCombat.cs" />
+    <Compile Include="Harmony\Patches\Loadout\Dialog_ManageDrugPolicies_DoEntryRow.cs" />
+    <Compile Include="Reloading\WorkGiver_WeaponEjectAmmo.cs" />
+    <Compile Include="Reloading\Designator_WeaponEjectAmmo.cs" />
+    <Compile Include="Reloading\JobDriver_EjectAmmo.cs" />
+    <Compile Include="Reloading\ReloadUtility.cs" />
+    <Compile Include="Harmony\Patches\Reloading\ReloadableUtility_WearerOf.cs" />
+    <Compile Include="Reloading\Stance_yyReload.cs" />
+    <Compile Include="Harmony\Patches\Ranged\Projectile_StartingTicksToImpact.cs" />
+    <Compile Include="Utilities\ArmorUtility.cs" />
+    <Compile Include="Harmony\Patches\Ranged\Verb_LaunchProjectile_TryCastShot.cs" />
+    <Compile Include="Harmony\HarmonyInstance.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="DualWield">
+      <HintPath>_DLL\publicized_assemblies\DualWield_publicized.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="System">
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <Target Name="MyCode" BeforeTargets="UpdateReferences">
+    <PropertyGroup>
+      <AssemblyCSharp>$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll</AssemblyCSharp>
+      <PubliciseOutputPath>$(PkgKrafs_Rimworld_Ref)\ref\net472\</PubliciseOutputPath>
+      <AssemblyCSharp_Publicised>$(PubliciseOutputPath)Assembly-CSharp_publicised.dll</AssemblyCSharp_Publicised>
+    </PropertyGroup>
+    <Publicise TargetAssemblyPath="$(AssemblyCSharp)" OutputPath="$(PkgKrafs_Rimworld_Ref)\ref\net472\" Condition="Exists('$(AssemblyCSharp)')" />
+    <ItemGroup>
+      <Reference Include="$(AssemblyCSharp_Publicised)">
+        <SpecificVersion>false</SpecificVersion>
+        <HintPath>$(AssemblyCSharp_Publicised)</HintPath>
+        <Implicit>true</Implicit>
+        <Private>false</Private>
+      </Reference>
+    </ItemGroup>
+  </Target>
+  <Target Name="UpdateReferences" AfterTargets="ResolveLockFileReferences">
+    <ItemGroup>
+      <Reference Remove="$(PkgKrafs_Rimworld_Ref)\ref\net472\Assembly-CSharp.dll" />
+    </ItemGroup>
+  </Target>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&#xD;&#xA;      call &quot;$(SolutionDir)\1.2\source\Scripts\ModCopy 1.2.bat&quot;&#xD;&#xA;      call :REPORT_ERRORLEVEL&#xD;&#xA;      goto :EOF&#xD;&#xA;&#xD;&#xA;      :REPORT_ERRORLEVEL&#xD;&#xA;      echo.&#xD;&#xA;      if ERRORLEVEL 16 echo ***FATAL ERROR*** &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 8 echo **FAILED COPIES** &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 4 echo *MISMATCHES* &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 2 echo EXTRA FILES &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 1 echo Copy successful &amp; goto :EOF&#xD;&#xA;      if ERRORLEVEL 0 echo –no change– &amp; goto :EOF&#xD;&#xA;" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

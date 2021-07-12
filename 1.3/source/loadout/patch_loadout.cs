@@ -293,7 +293,7 @@ namespace yayoCombat
             {
                 if (s_entriesInt.Invoke(__instance).RemoveAll((DrugPolicyEntry x) => x == null || x.drug == null) != 0)
                 {
-                    Log.Error("Some DrugPolicyEntries were null after loading.", false);
+                    Log.Error("Some DrugPolicyEntries were null after loading.");
                 }
             }
 

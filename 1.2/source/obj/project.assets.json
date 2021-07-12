@@ -903,9 +903,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\1.2\\source\\yayoCombat.csproj",
+      "projectUniqueName": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\1.2\\source\\yayoCombat-1.2.csproj",
       "projectName": "yayoCombat",
-      "projectPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\1.2\\source\\yayoCombat.csproj",
+      "projectPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\1.2\\source\\yayoCombat-1.2.csproj",
       "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
       "outputPath": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\RimWorld\\Mods\\Yayos-Combat-3\\1.2\\source\\obj\\",
       "projectStyle": "PackageReference",
