@@ -223,6 +223,10 @@ namespace yayoCombat
                     {
                         drawLoc.y += 0.03787879f;
                     }
+                    else
+                    {
+                        drawLoc.y += 0.03787879f;
+                    }
 
                     // 반동 계수 // recoil coefficient
                     float reboundFactor = 70f;
@@ -378,7 +382,7 @@ namespace yayoCombat
                     return;
                 }
             }
-            if (log) Log.Message("대기 : Waiting");
+        //    if (log) Log.Message("대기 : Waiting");
             // 대기 // Waiting
             if ((pawn.carryTracker == null || pawn.carryTracker.CarriedThing == null) && (pawn.Drafted || (pawn.CurJob != null && pawn.CurJob.def.alwaysShowWeapon) || (pawn.mindState.duty != null && pawn.mindState.duty.def.alwaysShowWeapon)))
             {

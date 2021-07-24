@@ -83,6 +83,12 @@ namespace yayoCombat
             {
                 Pawn p = cp.Wearer;
 
+                if (p.RaceProps.IsMechanoid)
+                {
+                    Thing ammo = ThingMaker.MakeThing(cp.AmmoDef);
+                    ammo.stackCount = cp.MaxAmmoNeeded(true);
+                    p.inventory.innerContainer.TryAdd(ammo);
+                }
                 List<Thing> ar_inven = p.inventory.innerContainer.ToList<Thing>();
                 List<Thing> ar_ammo = new List<Thing>();
                 for (int i = 0; i < ar_inven.Count; i++)

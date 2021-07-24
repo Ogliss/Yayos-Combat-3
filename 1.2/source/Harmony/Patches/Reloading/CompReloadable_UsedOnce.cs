@@ -12,11 +12,10 @@ namespace yayoCombat
         static bool Prefix(CompReloadable __instance)
         {
             if (!yayoCombat.ammo) return true;
-
             int remainingCharges0 = __instance.RemainingCharges;
             if (remainingCharges0 > 0)
             {
-                Traverse.Create(__instance).Field("remainingCharges").SetValue(remainingCharges0 - 1);
+                __instance.remainingCharges = remainingCharges0 - 1;
             }
             //if (__instance.VerbTracker.PrimaryVerb.caster == null) return false;
 

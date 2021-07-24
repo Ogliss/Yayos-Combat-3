@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace yayoCombat
 {
-//    [HarmonyPatch(typeof(PawnRenderer), "DrawEquipmentAiming")]
+    [HarmonyPatch(typeof(PawnRenderer), "DrawEquipmentAiming")]
     public static class patch_DrawEquipmentAiming
     {
 
@@ -120,6 +120,7 @@ namespace yayoCombat
             {
                 matSingle = eq.Graphic.MatSingle;
             }
+            mesh = mesh == MeshPool.plane10 ? MeshPool.GridPlane(eq.def.graphicData.drawSize) : MeshPool.GridPlaneFlip(eq.def.graphicData.drawSize);
             Graphics.DrawMesh(mesh, drawLoc, Quaternion.AngleAxis(num, Vector3.up), matSingle, 0);
             return false;
         }

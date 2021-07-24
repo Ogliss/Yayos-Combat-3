@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="DefOf\BodyPartGroupDefOf.cs" />
     <Compile Include="Harmony\Patches\Animation\PawnRenderer_DrawEquipment.cs" />
+    <Compile Include="Harmony\Patches\Armour\DamageWorker_AddInjury_ApplyDamageToPart.cs" />
     <Compile Include="Utilities\PawnRenderer_override.cs" />
     <Compile Include="DefOf\ApparelLayerDefOf.cs" />
     <Compile Include="DefOf\ThingCategoryDefOf.cs" />
@@ -79,7 +80,6 @@
     <Compile Include="Harmony\Patches\Melee\Thing_TakeDamage.cs" />
     <Compile Include="Harmony\Patches\Animation\PawnRenderer_DrawEquipmentAiming.cs" />
     <Compile Include="Harmony\Patches\Melee\Tool_AdjustedCooldown.cs" />
-    <Compile Include="Harmony\Patches\patch_DamageWorker_AddInjury.cs" />
     <Compile Include="Harmony\Patches\Reloading\Building_TurretGun_MakeGun.cs" />
     <Compile Include="Harmony\Patches\Reloading\CompReloadable_CreateVerbTargetCommand.cs" />
     <Compile Include="Harmony\Patches\Reloading\CompReloadable_PostExposeData.cs" />
@@ -97,7 +97,6 @@
     <Compile Include="Harmony\Patches\Reloading\ThingWithComps_GetFloatMenuOptions.cs" />
     <Compile Include="Harmony\Patches\Reloading\TraderKindDef_WillTrade.cs" />
     <Compile Include="Harmony\Patches\Reloading\WorkGiver_HasHuntingWeapon.cs" />
-    <Compile Include="Harmony\Patches\patch_DamageWorker.cs" />
     <Compile Include="yayoCombat.cs" />
     <Compile Include="Harmony\Patches\Loadout\Dialog_ManageDrugPolicies_DoEntryRow.cs" />
     <Compile Include="Reloading\WorkGiver_WeaponEjectAmmo.cs" />

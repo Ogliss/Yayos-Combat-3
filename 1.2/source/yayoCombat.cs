@@ -25,6 +25,9 @@ namespace yayoCombat
         }
 
 
+        private SettingHandle<bool> refillMechAmmoSetting;
+        public static bool refillMechAmmo = true;
+
         private SettingHandle<bool> ammoSetting;
         public static bool ammo = false;
 
@@ -119,6 +122,9 @@ namespace yayoCombat
         {
             ammoSetting = Settings.GetHandle<bool>("ammo", "ammo_title".Translate(), "ammo_desc".Translate(), false);
             ammo = ammoSetting.Value;
+
+            refillMechAmmoSetting = Settings.GetHandle<bool>("refillMechAmmo", "refillMechAmmo_title".Translate(), "refillMechAmmo_desc".Translate(), true);
+            refillMechAmmo = refillMechAmmoSetting.Value;
 
             ammoGenSetting = Settings.GetHandle<float>("ammoGen", "ammoGen_title".Translate(), "ammoGen_desc".Translate(), 1f);
             ammoGen = ammoGenSetting.Value;
@@ -274,6 +280,452 @@ namespace yayoCombat
             //Log.Message($"# Yayo's Combat : init 1");
         }
 
+        public static void HandsAndFeetProtection()
+        {
+            foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
+                                   where
+                                       thing.apparel != null
+                                       && thing.apparel.bodyPartGroups != null
+                                       && thing.apparel.bodyPartGroups.Count > 0
+                                       && (thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Hands) || thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Feet))
+                                       && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso)
+                                       && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead)
+                                       && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead)
+                                       && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Shoulders)
+                                   select thing)
+            {
+                List<ApparelLayerDef> b = new List<ApparelLayerDef>();
+                for (int i = 0; i < t.apparel.layers.Count; i++)
+                {
+                    switch (t.apparel.layers[i].defName)
+                    {
+                        case "OnSkin":
+                            b.Add(yayoCombat_Defs.ApparelLayerDefOf.OnSkin_A);
+                            break;
+                        case "Shell":
+                            b.Add(yayoCombat_Defs.ApparelLayerDefOf.Shell_A);
+                            break;
+                        case "Middle":
+                            b.Add(yayoCombat_Defs.ApparelLayerDefOf.Middle_A);
+                            break;
+                        case "Belt":
+                            b.Add(yayoCombat_Defs.ApparelLayerDefOf.Belt_A);
+                            break;
+                        case "Overhead":
+                            b.Add(yayoCombat_Defs.ApparelLayerDefOf.Overhead_A);
+                            break;
+                    }
+
+                }
+                if (b.Count > 0)
+                {
+                    t.apparel.layers = b;
+                }
+
+            }
+
+
+            foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
+                                   where
+                                        thing.apparel != null
+                                        && thing.apparel.bodyPartGroups != null
+                                        && thing.apparel.bodyPartGroups.Count > 0
+                                   select thing)
+            {
+                List<BodyPartGroupDef> b = t.apparel.bodyPartGroups;
+                if (b.Contains(BodyPartGroupDefOf.Arms) && !b.Contains(BodyPartGroupDefOf.Hands))
+                {
+                    b.Add(BodyPartGroupDefOf.Hands);
+                }
+                if (b.Contains(BodyPartGroupDefOf.Legs) && !b.Contains(BodyPartGroupDefOf.Feet))
+                {
+                    b.Add(BodyPartGroupDefOf.Feet);
+                }
+
+
+            }
+        }
+
+        public static void EnableAmmunitionSystem()
+        {
+
+            List<string> specialKeyword_lower = new List<string>() { "frost", "energy", "cryo", "gleam", "laser", "plasma", "beam", "magic"
+                    , "thunder", "poison", "elec", "wave", "psy", "cold", "tox", "atom", "pulse", "tornado", "water", "liqu", "tele", "matter"
+                };
+            List<string> specialKeyword_lowerOver = new List<string>() { "ice"
+                };
+            List<string> specialKeyword_fullCase = new List<string>() { "Ice"
+                };
+
+            // 무기셋업
+            // weapon setup
+            foreach (ThingDef t in from t in DefDatabase<ThingDef>.AllDefs
+                                   where
+                                        t.IsRangedWeapon
+                                        && t.Verbs != null
+                                        && t.Verbs.Count >= 1
+                                        && (t.modExtensions == null || !t.modExtensions.Exists(x => x.ToString() == "HeavyWeapons.HeavyWeapon"))
+                                   select t)
+            {
+
+                if (t.techLevel <= TechLevel.Animal) continue;
+                string ammoDefName = "";
+
+                VerbProperties v = t.Verbs[0];
+
+                if (v.verbClass == null
+                    || v.verbClass == typeof(Verb_ShootOneUse)
+                    || v.consumeFuelPerShot > 0f
+                    || (t.weaponTags != null && (t.weaponTags.Contains("TurretGun") || t.weaponTags.Contains("Artillery") || t.weaponTags.Contains("yy_NoAmmo")))
+                    )
+                {
+                    //Log.Message($"# {t.defName}");
+                    continue;
+                }
+
+                t.menuHidden = false;
+
+                CompProperties_Reloadable cp = new CompProperties_Reloadable();
+
+                float shotPerSec = (float)v.burstShotCount / ((float)(v.ticksBetweenBurstShots * 0.016666f * (float)v.burstShotCount) + v.warmupTime + t.statBases.GetStatValueFromList(StatDefOf.RangedWeapon_Cooldown, 0f)); // 1초당 평균 발사 수
+                                                                                                                                                                                                                               // 최대 충전 시, 전투 지속시간
+                                                                                                                                                                                                                               // When fully charged, battle duration
+                float fightTime = 60f * 1.5f;
+                // 최대 충전 수
+                // maximum number of charges
+                cp.maxCharges = Mathf.Max(3, Mathf.RoundToInt(fightTime * shotPerSec * maxAmmo));
+                // 1발당 자원 필요량
+                // Resource requirements per shot
+                cp.ammoCountPerCharge = 1;
+                // 재장전 시간
+                // reload time
+                cp.baseReloadTicks = Mathf.RoundToInt(60);
+
+
+                cp.soundReload = SoundDefOf.Standard_Reload;
+                cp.hotKey = KeyBindingDefOf.Misc4;
+                cp.chargeNoun = "ammo";
+                cp.displayGizmoWhileUndrafted = true;
+
+
+                en_ammoType ammoType = en_ammoType.normal;
+
+
+
+                if (v.defaultProjectile != null && v.defaultProjectile.projectile != null && v.defaultProjectile.projectile.damageDef != null)
+                {
+
+
+                    if (t.weaponTags != null)
+                    {
+                        if (t.weaponTags.Contains("ammo_none")) continue;
+
+                        string customAmmoCode = getContainStringByList("ammo_", t.weaponTags);
+
+                        if (customAmmoCode != "")
+                        {
+                            string[] ar_customAmmoCode = customAmmoCode.Split('/');
+
+                            ammoDefName = $"yy_{ar_customAmmoCode[0]}";
+                            if (ThingDef.Named(ammoDefName) == null) ammoDefName = "";
+
+                            int customAmmoCount;
+                            if (ar_customAmmoCode.Length >= 2 && int.TryParse(ar_customAmmoCode[1], out customAmmoCount))
+                            {
+                                cp.maxCharges = Mathf.Max(1, Mathf.RoundToInt(customAmmoCount * maxAmmo));
+                            }
+
+                            int customConsume;
+                            if (ar_customAmmoCode.Length >= 3 && int.TryParse(ar_customAmmoCode[2], out customConsume))
+                            {
+                                cp.ammoCountPerCharge = Mathf.Max(1, customConsume);
+                            }
+                        }
+
+                    }
+
+                    if (ammoDefName == "")
+                    {
+                        ammoDefName = "yy_ammo_";
+
+                        ProjectileProperties pp = v.defaultProjectile.projectile;
+                        if (new List<DamageDef>() { DamageDefOf.Bomb, DamageDefOf.Flame, DamageDefOf.Burn }.Contains(pp.damageDef))
+                        {
+                            // 발사체 타입 : 폭발, 화염
+                            ammoType = en_ammoType.fire;
+                            cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
+                        }
+                        else if (new List<DamageDef>() { DamageDefOf.Smoke }.Contains(pp.damageDef))
+                        {
+                            // 발사체 타입 : 연막
+                            ammoType = en_ammoType.fire;
+                            cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius / 3f));
+                        }
+                        else if (new List<DamageDef>() { DamageDefOf.EMP, DamageDefOf.Deterioration, DamageDefOf.Extinguish, DamageDefOf.Frostbite, DamageDefOf.Rotting, DamageDefOf.Stun, DamageDefOf.TornadoScratch }.Contains(pp.damageDef))
+                        {
+                            // 발사체 타입 : EMP
+                            ammoType = en_ammoType.emp;
+                            cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius / 3f));
+
+                        }
+                        else if (containCheckByList(t.defName.ToLower(), specialKeyword_lower)
+                           || containCheckByList(t.defName, specialKeyword_fullCase)
+                           || containCheckByList(pp.damageDef.defName.ToLower(), specialKeyword_lower)
+                           || containCheckByList(pp.damageDef.defName, specialKeyword_fullCase)
+                           ) // 데미지타입 키워드검색
+                        {
+                            // 특수타입 키워드가 포함된 무기 defname
+                            ammoType = en_ammoType.emp;
+                            cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
+                        }
+                        //else if (pp.damageDef.modContentPack.ToString().Contains("Ludeon")) // 발사체 타입 : 모든 바닐라 데미지 타입
+                        else // 발사체 타입 : 그외 모든 데미지 타입 (모드 데미지타입 포함
+                        {
+
+                            if (pp.explosionRadius > 0f)
+                            {
+                                // 폭발하는 경우
+                                cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
+
+                                if (pp.damageDef.armorCategory != null)
+                                {
+                                    switch (pp.damageDef.armorCategory.defName) // 방어 타입에 따라 구분
+                                    {
+                                        case "Sharp":
+                                            ammoType = en_ammoType.fire;
+                                            break;
+                                        case "Heat":
+                                            ammoType = en_ammoType.fire;
+                                            break;
+                                        case "Blunt":
+                                            ammoType = en_ammoType.fire;
+                                            break;
+                                        default: // 모드 추가 방어타입
+                                            ammoType = en_ammoType.emp;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    // 방어타입 없음
+                                    ammoType = en_ammoType.emp;
+                                }
+
+                            }
+                            else
+                            {
+                                // 폭발하지 않음
+                                if (pp.damageDef.armorCategory != null)
+                                {
+                                    switch (pp.damageDef.armorCategory.defName) // 방어 타입에 따라 구분
+                                    {
+                                        case "Sharp":
+                                            ammoType = en_ammoType.normal;
+                                            break;
+                                        case "Heat":
+                                            ammoType = en_ammoType.fire;
+                                            break;
+                                        case "Blunt":
+                                            ammoType = en_ammoType.normal;
+                                            break;
+                                        default: // 모드 추가 방어타입
+                                            ammoType = en_ammoType.emp;
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    // 방어타입 없음
+                                    ammoType = en_ammoType.emp;
+                                    cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
+
+                                }
+                            }
+
+                        }
+
+
+
+                        if (t.techLevel >= TechLevel.Spacer)
+                        {
+                            // 우주 이상
+                            ammoDefName += "spacer";
+
+                        }
+                        else if (t.techLevel >= TechLevel.Industrial)
+                        {
+                            // 산업 이상
+                            ammoDefName += "industrial";
+                        }
+                        else
+                        {
+                            // 원시 이상
+                            ammoDefName += "primitive";
+                        }
+
+                        switch (ammoType)
+                        {
+                            case en_ammoType.fire:
+                                ammoDefName += "_fire";
+                                break;
+                            case en_ammoType.emp:
+                                ammoDefName += "_emp";
+                                break;
+                        }
+
+
+                    }
+
+
+                    cp.ammoDef = ThingDef.Named(ammoDefName);
+
+                }
+
+
+                // 완전한 커스텀 탄약 Def
+                if (t.weaponTags != null)
+                {
+                    string customAmmoCode2 = getContainStringByList("ammoDef_", t.weaponTags);
+                    if (customAmmoCode2 != "")
+                    {
+                        string[] ar_customAmmoCode2 = customAmmoCode2.Split('/');
+                        string[] ar_customAmmoDefCode = ar_customAmmoCode2[0].Split('_');
+                        if (ar_customAmmoDefCode.Length >= 2)
+                        {
+                            cp.ammoDef = ThingDef.Named(ar_customAmmoDefCode[1]);
+
+                            if (cp.ammoDef != null) ar_customAmmoDef.Add(cp.ammoDef);
+
+                            int customAmmoCount;
+                            if (ar_customAmmoCode2.Length >= 2 && int.TryParse(ar_customAmmoCode2[1], out customAmmoCount))
+                            {
+                                cp.maxCharges = Mathf.Max(1, Mathf.RoundToInt(customAmmoCount * maxAmmo));
+                            }
+
+                            int customConsume;
+                            if (ar_customAmmoCode2.Length >= 3 && int.TryParse(ar_customAmmoCode2[2], out customConsume))
+                            {
+                                cp.ammoCountPerCharge = Mathf.Max(1, customConsume);
+                            }
+
+                        }
+                    }
+                }
+
+
+
+
+
+                if (cp.ammoDef == null)
+                {
+                    if (t.techLevel >= TechLevel.Spacer)
+                    {
+                        // 우주 이상
+                        cp.ammoDef = ThingDef.Named("yy_ammo_spacer");
+
+                    }
+                    else if (t.techLevel >= TechLevel.Industrial)
+                    {
+                        // 산업 이상
+                        cp.ammoDef = ThingDef.Named("yy_ammo_industrial");
+                    }
+                    else
+                    {
+                        // 원시 이상
+                        cp.ammoDef = ThingDef.Named("yy_ammo_primitive");
+                    }
+
+                }
+
+
+                t.comps.Add(cp);
+
+                /*
+                // 디버그 로그
+                if(cp.ammoDef.defName == "yy_ammo_primitive_fire" || cp.ammoDef.defName == "yy_ammo_primitive_emp")
+                {
+                    Log.Warning(cp.ammoDef.defName);
+                }
+                */
+
+                /*
+                // 디버그 로그
+                if (v.defaultProjectile != null && v.defaultProjectile.projectile != null && v.defaultProjectile.projectile.damageDef != null)
+                {
+                    ProjectileProperties pp = v.defaultProjectile.projectile;
+                    if (pp.damageDef.armorCategory != null)
+                    {
+                        Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], dmgType:[{pp.damageDef}], armorType:[{pp.damageDef.armorCategory}], explosion:[{pp.explosionRadius}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
+                    }
+                    else
+                    {
+                        Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], dmgType:[{pp.damageDef}], explosion:[{pp.explosionRadius}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
+                    }
+
+                }
+                else
+                {
+                    Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
+                }
+                */
+
+
+
+
+
+
+            }
+
+            // 레시피
+            foreach (RecipeDef t in from thing in DefDatabase<RecipeDef>.AllDefs
+                                    where
+                                         thing.defName.Contains("yy_ammo")
+                                    select thing)
+            {
+                if (t.products != null && t.products.Count > 0)
+                {
+                    t.products[0].count = Mathf.RoundToInt((float)t.products[0].count * ammoGen);
+                }
+            }
+        }
+
+        public static void DisableAmmunitionSystem()
+        {
+            // 탄약 시스템 사용안함
+            // 기본 탄약 레시피 제거
+            foreach (RecipeDef t in from thing in DefDatabase<RecipeDef>.AllDefs
+                                    where
+                                         thing.defName.Contains("yy_ammo")
+                                    select thing)
+            {
+                t.recipeUsers = new List<ThingDef>();
+                t.ResolveReferences();
+            }
+
+            foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
+                                   where
+                                        thing.defName.Contains("yy_ammo")
+                                   select thing)
+            {
+                t.tradeability = Tradeability.None;
+                t.tradeTags = null;
+                t.ResolveReferences();
+            }
+        }
+
+        public static void AdvancedArmour()
+        {
+            foreach (PawnKindDef p in from pawn in DefDatabase<PawnKindDef>.AllDefs
+                                      where
+                                           pawn.defaultFactionType == FactionDefOf.Mechanoid
+                                      select pawn
+                               )
+            {
+                p.race.SetStatBaseValue(StatDefOf.ArmorRating_Sharp, p.race.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp) * 1.3f);
+                p.combatPower *= 1.3f; // 메카노이드 수량 감소
+            }
+        }
+
         static public void patchDef2()
         {
             //Log.Message($"# Yayo's Combat : init 2");
@@ -281,472 +733,73 @@ namespace yayoCombat
             // foot and hand protection
             if (handProtect)
             {
-                foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
-                        where
-                            thing.apparel != null
-                            && thing.apparel.bodyPartGroups != null
-                            && thing.apparel.bodyPartGroups.Count > 0
-                            && (thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Hands) || thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Feet))
-                            && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Torso)
-                            && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.FullHead)
-                            && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.UpperHead)
-                            && !thing.apparel.bodyPartGroups.Contains(BodyPartGroupDefOf.Shoulders)
-                        select thing)
+                try
                 {
-                    List<ApparelLayerDef> b = new List<ApparelLayerDef>();
-                    for (int i = 0; i < t.apparel.layers.Count; i++)
-                    {
-                        switch (t.apparel.layers[i].defName)
-                        {
-                            case "OnSkin":
-                                b.Add(yayoCombat_Defs.ApparelLayerDefOf.OnSkin_A);
-                                break;
-                            case "Shell":
-                                b.Add(yayoCombat_Defs.ApparelLayerDefOf.Shell_A);
-                                break;
-                            case "Middle":
-                                b.Add(yayoCombat_Defs.ApparelLayerDefOf.Middle_A);
-                                break;
-                            case "Belt":
-                                b.Add(yayoCombat_Defs.ApparelLayerDefOf.Belt_A);
-                                break;
-                            case "Overhead":
-                                b.Add(yayoCombat_Defs.ApparelLayerDefOf.Overhead_A);
-                                break;
-                        }
-
-                    }
-                    if(b.Count > 0)
-                    {
-                        t.apparel.layers = b;
-                    }
-                    
+                    HandsAndFeetProtection();
                 }
-
-
-                foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
-                                       where
-                                            thing.apparel != null
-                                            && thing.apparel.bodyPartGroups != null
-                                            && thing.apparel.bodyPartGroups.Count > 0
-                                       select thing)
+                catch (Exception)
                 {
-                    List<BodyPartGroupDef> b = t.apparel.bodyPartGroups;
-                    if (b.Contains(BodyPartGroupDefOf.Arms) && !b.Contains(BodyPartGroupDefOf.Hands))
-                    {
-                        b.Add(BodyPartGroupDefOf.Hands);
-                    }
-                    if (b.Contains(BodyPartGroupDefOf.Legs) && !b.Contains(BodyPartGroupDefOf.Feet))
-                    {
-                        b.Add(BodyPartGroupDefOf.Feet);
-                    }
-
-
+                    Log.Warning("Yayo's Comabt Hands and Feet Patch failed");
+                    throw;
                 }
-
             }
 
             // 탄약
             // ammunition
             if (ammo)
             {
-                List<string> specialKeyword_lower = new List<string>() { "frost", "energy", "cryo", "gleam", "laser", "plasma", "beam", "magic"
-                    , "thunder", "poison", "elec", "wave", "psy", "cold", "tox", "atom", "pulse", "tornado", "water", "liqu", "tele", "matter"
-                };
-                List<string> specialKeyword_lowerOver = new List<string>() { "ice"
-                };
-                List<string> specialKeyword_fullCase = new List<string>() { "Ice"
-                };
-
-                // 무기셋업
-                // weapon setup
-                foreach (ThingDef t in from t in DefDatabase<ThingDef>.AllDefs
-                                       where
-                                            t.IsRangedWeapon
-                                            && t.Verbs != null
-                                            && t.Verbs.Count >= 1
-                                            && (t.modExtensions == null || !t.modExtensions.Exists(x => x.ToString() == "HeavyWeapons.HeavyWeapon"))
-                                       select t)
+                try
+                {
+                    EnableAmmunitionSystem();
+                }
+                catch (Exception)
                 {
 
-                    if (t.techLevel <= TechLevel.Animal) continue;
-                    string ammoDefName = "";
-
-                    VerbProperties v = t.Verbs[0];
-
-                    if (v.verbClass == null
-                        || v.verbClass == typeof(Verb_ShootOneUse)
-                        || v.consumeFuelPerShot > 0f
-                        || (t.weaponTags != null && (t.weaponTags.Contains("TurretGun") || t.weaponTags.Contains("Artillery")))
-                        )
-                    {
-                        //Log.Message($"# {t.defName}");
-                        continue;
-                    }
-
-                    t.menuHidden = false;
-
-                    CompProperties_Reloadable cp = new CompProperties_Reloadable();
-
-                    float shotPerSec = (float)v.burstShotCount / ((float)(v.ticksBetweenBurstShots * 0.016666f * (float)v.burstShotCount) + v.warmupTime + t.statBases.GetStatValueFromList(StatDefOf.RangedWeapon_Cooldown, 0f)); // 1초당 평균 발사 수
-                    // 최대 충전 시, 전투 지속시간
-                    // When fully charged, battle duration
-                    float fightTime = 60f * 1.5f;
-                    // 최대 충전 수
-                    // maximum number of charges
-                    cp.maxCharges = Mathf.Max(3, Mathf.RoundToInt(fightTime * shotPerSec * maxAmmo));
-                    // 1발당 자원 필요량
-                    // Resource requirements per shot
-                    cp.ammoCountPerCharge = 1;
-                    // 재장전 시간
-                    // reload time
-                    cp.baseReloadTicks = Mathf.RoundToInt(60); 
-
-
-                    cp.soundReload = SoundDefOf.Standard_Reload;
-                    cp.hotKey = KeyBindingDefOf.Misc4;
-                    cp.chargeNoun = "ammo";
-                    cp.displayGizmoWhileUndrafted = true;
-
-                    
-                    en_ammoType ammoType = en_ammoType.normal;
-
-
-
-                    if (v.defaultProjectile != null && v.defaultProjectile.projectile != null && v.defaultProjectile.projectile.damageDef != null)
-                    {
-
-
-                        if (t.weaponTags != null)
-                        {
-                            if (t.weaponTags.Contains("ammo_none")) continue;
-
-                            string customAmmoCode = getContainStringByList("ammo_", t.weaponTags);
-
-                            if (customAmmoCode != "")
-                            {
-                                string[] ar_customAmmoCode = customAmmoCode.Split('/');
-
-                                ammoDefName = $"yy_{ar_customAmmoCode[0]}";
-                                if (ThingDef.Named(ammoDefName) == null) ammoDefName = "";
-
-                                int customAmmoCount;
-                                if(ar_customAmmoCode.Length >= 2 && int.TryParse(ar_customAmmoCode[1], out customAmmoCount))
-                                {
-                                    cp.maxCharges = Mathf.Max(1, Mathf.RoundToInt(customAmmoCount * maxAmmo));
-                                }
-
-                                int customConsume;
-                                if (ar_customAmmoCode.Length >= 3 && int.TryParse(ar_customAmmoCode[2], out customConsume))
-                                {
-                                    cp.ammoCountPerCharge = Mathf.Max(1, customConsume);
-                                }
-                            }
-
-                        }
-
-                        if (ammoDefName == "")
-                        {
-                            ammoDefName = "yy_ammo_";
-
-                            ProjectileProperties pp = v.defaultProjectile.projectile;
-                            if (new List<DamageDef>() { DamageDefOf.Bomb, DamageDefOf.Flame, DamageDefOf.Burn }.Contains(pp.damageDef))
-                            {
-                                // 발사체 타입 : 폭발, 화염
-                                ammoType = en_ammoType.fire;
-                                cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
-                            }
-                            else if (new List<DamageDef>() { DamageDefOf.Smoke }.Contains(pp.damageDef))
-                            {
-                                // 발사체 타입 : 연막
-                                ammoType = en_ammoType.fire;
-                                cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius / 3f));
-                            }
-                            else if (new List<DamageDef>() { DamageDefOf.EMP, DamageDefOf.Deterioration, DamageDefOf.Extinguish, DamageDefOf.Frostbite, DamageDefOf.Rotting, DamageDefOf.Stun, DamageDefOf.TornadoScratch }.Contains(pp.damageDef))
-                            {
-                                // 발사체 타입 : EMP
-                                ammoType = en_ammoType.emp;
-                                cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius / 3f));
-
-                            }
-                            else if (containCheckByList(t.defName.ToLower(), specialKeyword_lower)
-                               || containCheckByList(t.defName, specialKeyword_fullCase)
-                               || containCheckByList(pp.damageDef.defName.ToLower(), specialKeyword_lower)
-                               || containCheckByList(pp.damageDef.defName, specialKeyword_fullCase)
-                               ) // 데미지타입 키워드검색
-                            {
-                                // 특수타입 키워드가 포함된 무기 defname
-                                ammoType = en_ammoType.emp;
-                                cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
-                            }
-                            //else if (pp.damageDef.modContentPack.ToString().Contains("Ludeon")) // 발사체 타입 : 모든 바닐라 데미지 타입
-                            else // 발사체 타입 : 그외 모든 데미지 타입 (모드 데미지타입 포함
-                            {
-
-                                if (pp.explosionRadius > 0f)
-                                {
-                                    // 폭발하는 경우
-                                    cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
-
-                                    if (pp.damageDef.armorCategory != null)
-                                    {
-                                        switch (pp.damageDef.armorCategory.defName) // 방어 타입에 따라 구분
-                                        {
-                                            case "Sharp":
-                                                ammoType = en_ammoType.fire;
-                                                break;
-                                            case "Heat":
-                                                ammoType = en_ammoType.fire;
-                                                break;
-                                            case "Blunt":
-                                                ammoType = en_ammoType.fire;
-                                                break;
-                                            default: // 모드 추가 방어타입
-                                                ammoType = en_ammoType.emp;
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // 방어타입 없음
-                                        ammoType = en_ammoType.emp;
-                                    }
-
-                                }
-                                else
-                                {
-                                    // 폭발하지 않음
-                                    if (pp.damageDef.armorCategory != null)
-                                    {
-                                        switch (pp.damageDef.armorCategory.defName) // 방어 타입에 따라 구분
-                                        {
-                                            case "Sharp":
-                                                ammoType = en_ammoType.normal;
-                                                break;
-                                            case "Heat":
-                                                ammoType = en_ammoType.fire;
-                                                break;
-                                            case "Blunt":
-                                                ammoType = en_ammoType.normal;
-                                                break;
-                                            default: // 모드 추가 방어타입
-                                                ammoType = en_ammoType.emp;
-                                                break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // 방어타입 없음
-                                        ammoType = en_ammoType.emp;
-                                        cp.ammoCountPerCharge = Mathf.Max(1, Mathf.RoundToInt(pp.explosionRadius));
-
-                                    }
-                                }
-
-                            }
-
-
-
-                            if (t.techLevel >= TechLevel.Spacer)
-                            {
-                                // 우주 이상
-                                ammoDefName += "spacer";
-
-                            }
-                            else if (t.techLevel >= TechLevel.Industrial)
-                            {
-                                // 산업 이상
-                                ammoDefName += "industrial";
-                            }
-                            else
-                            {
-                                // 원시 이상
-                                ammoDefName += "primitive";
-                            }
-
-                            switch (ammoType)
-                            {
-                                case en_ammoType.fire:
-                                    ammoDefName += "_fire";
-                                    break;
-                                case en_ammoType.emp:
-                                    ammoDefName += "_emp";
-                                    break;
-                            }
-
-
-                        }
-
-
-                        cp.ammoDef = ThingDef.Named(ammoDefName);
-
-                    }
-
-
-                    // 완전한 커스텀 탄약 Def
-                    if(t.weaponTags != null)
-                    {
-                        string customAmmoCode2 = getContainStringByList("ammoDef_", t.weaponTags);
-                        if (customAmmoCode2 != "")
-                        {
-                            string[] ar_customAmmoCode2 = customAmmoCode2.Split('/');
-                            string[] ar_customAmmoDefCode = ar_customAmmoCode2[0].Split('_');
-                            if (ar_customAmmoDefCode.Length >= 2)
-                            {
-                                cp.ammoDef = ThingDef.Named(ar_customAmmoDefCode[1]);
-
-                                if(cp.ammoDef != null) ar_customAmmoDef.Add(cp.ammoDef);
-
-                                int customAmmoCount;
-                                if (ar_customAmmoCode2.Length >= 2 && int.TryParse(ar_customAmmoCode2[1], out customAmmoCount))
-                                {
-                                    cp.maxCharges = Mathf.Max(1, Mathf.RoundToInt(customAmmoCount * maxAmmo));
-                                }
-
-                                int customConsume;
-                                if (ar_customAmmoCode2.Length >= 3 && int.TryParse(ar_customAmmoCode2[2], out customConsume))
-                                {
-                                    cp.ammoCountPerCharge = Mathf.Max(1, customConsume);
-                                }
-
-                            }
-                        }
-                    }
-                    
-
-
-
-
-                    if (cp.ammoDef == null)
-                    {
-                        if (t.techLevel >= TechLevel.Spacer)
-                        {
-                            // 우주 이상
-                            cp.ammoDef = ThingDef.Named("yy_ammo_spacer");
-
-                        }
-                        else if (t.techLevel >= TechLevel.Industrial)
-                        {
-                            // 산업 이상
-                            cp.ammoDef = ThingDef.Named("yy_ammo_industrial");
-                        }
-                        else
-                        {
-                            // 원시 이상
-                            cp.ammoDef = ThingDef.Named("yy_ammo_primitive");
-                        }
-
-                    }
-
-
-                    t.comps.Add(cp);
-
-                    /*
-                    // 디버그 로그
-                    if(cp.ammoDef.defName == "yy_ammo_primitive_fire" || cp.ammoDef.defName == "yy_ammo_primitive_emp")
-                    {
-                        Log.Warning(cp.ammoDef.defName);
-                    }
-                    */
-
-                    /*
-                    // 디버그 로그
-                    if (v.defaultProjectile != null && v.defaultProjectile.projectile != null && v.defaultProjectile.projectile.damageDef != null)
-                    {
-                        ProjectileProperties pp = v.defaultProjectile.projectile;
-                        if (pp.damageDef.armorCategory != null)
-                        {
-                            Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], dmgType:[{pp.damageDef}], armorType:[{pp.damageDef.armorCategory}], explosion:[{pp.explosionRadius}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
-                        }
-                        else
-                        {
-                            Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], dmgType:[{pp.damageDef}], explosion:[{pp.explosionRadius}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
-                        }
-
-                    }
-                    else
-                    {
-                        Log.Message($"{t.label}({t.defName}) - [{cp.ammoDef.label}], ammoPerCharge:[{cp.ammoCountPerCharge}]");
-                    }
-                    */
-
-
-                    
-
-
-
+                    Log.Warning("Yayo's Comabt Enable Ammunition System Patch failed");
+                    throw;
                 }
-
-                // 레시피
-                foreach (RecipeDef t in from thing in DefDatabase<RecipeDef>.AllDefs
-                                        where
-                                             thing.defName.Contains("yy_ammo")
-                                        select thing)
-                {
-                    if (t.products != null && t.products.Count > 0)
-                    {
-                        t.products[0].count = Mathf.RoundToInt((float)t.products[0].count * ammoGen);
-                    }
-                }
-
-
-
-
-
             }
             else
             {
-
-                // 탄약 시스템 사용안함
-
-                // 기본 탄약 레시피 제거
-                foreach (RecipeDef t in from thing in DefDatabase<RecipeDef>.AllDefs
-                                        where
-                                             thing.defName.Contains("yy_ammo")
-                                        select thing)
+                try
                 {
-                    t.recipeUsers = new List<ThingDef>();
+                    DisableAmmunitionSystem();
                 }
-
-                foreach (ThingDef t in from thing in DefDatabase<ThingDef>.AllDefs
-                                       where
-                                            thing.defName.Contains("yy_ammo")
-                                       select thing)
+                catch (Exception)
                 {
-                    t.tradeability = Tradeability.None;
-                    t.tradeTags = null;
-                }
 
+                    Log.Warning("Yayo's Comabt Disable Ammunition System Patch failed");
+                    throw;
+                }
             }
-
-
-
 
             // 메카노이드 방어력 강화
             if (yayoCombat.advArmor)
             {
-                foreach (PawnKindDef p in from pawn in DefDatabase<PawnKindDef>.AllDefs
-                                          where
-                                               pawn.defaultFactionType == FactionDefOf.Mechanoid
-                                          select pawn
-                                   )
+                try
                 {
-                    p.race.SetStatBaseValue(StatDefOf.ArmorRating_Sharp, p.race.GetStatValueAbstract(StatDefOf.ArmorRating_Sharp) * 1.3f);
-                    p.combatPower *= 1.3f; // 메카노이드 수량 감소
+                    AdvancedArmour();
+                }
+                catch (Exception)
+                {
+                    Log.Warning("Yayo's Comabt Advanced Armour System Patch failed");
+                    throw;
                 }
             }
             //PawnKindDef.Named("Mech_Centipede").combatPower *= 1.3f;
 
-
             // 대전차 로켓
-            ThingDef def_rocket = ThingDef.Named("Gun_AntiArmor_Rocket");
-            if (enemyRocket)
+            ThingDef def_rocket = DefDatabase<ThingDef>.GetNamedSilentFail("Gun_AntiArmor_Rocket");
+            if (def_rocket != null)
             {
+                if (enemyRocket)
+                {
 
-            }
-            else
-            {
-                def_rocket.weaponTags = new List<string>();
+                }
+                else
+                {
+                    def_rocket.weaponTags = new List<string>();
+                }
             }
 
 

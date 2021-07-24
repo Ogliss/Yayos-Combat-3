@@ -33,7 +33,7 @@ namespace yayoCombat
                 }
                 else
                 {
-                    commandReloadable.icon = (UnityEngine.Object)verb.UIIcon != (UnityEngine.Object)BaseContent.BadTex ? verb.UIIcon : gear.def.uiIcon;
+                    commandReloadable.icon = verb.UIIcon != BaseContent.BadTex ? verb.UIIcon : gear.def.uiIcon;
                     commandReloadable.iconAngle = gear.def.uiIconAngle;
                     commandReloadable.iconOffset = gear.def.uiIconOffset;
                     commandReloadable.defaultIconColor = gear.DrawColor;
@@ -41,7 +41,7 @@ namespace yayoCombat
                 if (!__instance.Wearer.IsColonistPlayerControlled || !__instance.Wearer.Drafted)
                     commandReloadable.Disable();
                 else if (verb.verbProps.violent && __instance.Wearer.WorkTagIsDisabled(WorkTags.Violent))
-                    commandReloadable.Disable((string)("IsIncapableOfViolenceLower".Translate((NamedArgument)__instance.Wearer.LabelShort, (NamedArgument)(Thing)__instance.Wearer).CapitalizeFirst() + "."));
+                    commandReloadable.Disable("IsIncapableOfViolenceLower".Translate(__instance.Wearer.LabelShort, __instance.Wearer).CapitalizeFirst() + ".");
                 else if (!__instance.CanBeUsed)
                     commandReloadable.Disable(__instance.DisabledReason(__instance.MinAmmoNeeded(false), __instance.MaxAmmoNeeded(false)));
 
@@ -64,7 +64,7 @@ namespace yayoCombat
                 }
                 else
                 {
-                    commandReloadable.icon = (UnityEngine.Object)verb.UIIcon != (UnityEngine.Object)BaseContent.BadTex ? verb.UIIcon : gear.def.uiIcon;
+                    commandReloadable.icon = verb.UIIcon != BaseContent.BadTex ? verb.UIIcon : gear.def.uiIcon;
                     commandReloadable.iconAngle = gear.def.uiIconAngle;
                     commandReloadable.iconOffset = gear.def.uiIconOffset;
                     commandReloadable.defaultIconColor = gear.DrawColor;
@@ -72,7 +72,7 @@ namespace yayoCombat
                 if (!__instance.Wearer.IsColonistPlayerControlled)
                     commandReloadable.Disable();
                 else if (verb.verbProps.violent && __instance.Wearer.WorkTagIsDisabled(WorkTags.Violent))
-                    commandReloadable.Disable((string)("IsIncapableOfViolenceLower".Translate((NamedArgument)__instance.Wearer.LabelShort, (NamedArgument)(Thing)__instance.Wearer).CapitalizeFirst() + "."));
+                    commandReloadable.Disable((string)("IsIncapableOfViolenceLower".Translate(__instance.Wearer.LabelShort, __instance.Wearer).CapitalizeFirst() + "."));
                 else if (!__instance.CanBeUsed)
                     commandReloadable.Disable(__instance.DisabledReason(__instance.MinAmmoNeeded(false), __instance.MaxAmmoNeeded(false)));
 

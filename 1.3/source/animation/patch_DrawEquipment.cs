@@ -97,6 +97,10 @@ namespace yayoCombat
                 y = -0.1f + -0.3787879f;
                 x = -0.05f;
             }
+            if (pawn.Rotation == Rot4.North)
+            {
+                y = -0.3787879f;
+            }
             // 주무기 // Mainhand
             if (offHandEquip == null || offHandEquip != pawn.equipment.Primary)
             {
