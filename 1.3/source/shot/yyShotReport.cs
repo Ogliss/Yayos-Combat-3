@@ -189,7 +189,7 @@ namespace yayoCombat
 					missR = missR * 0.95f + 0.05f;
 					Mathf.Clamp(missR, 0.05f, 0.95f);
 
-					__instance.ThrowDebugText("missR: " + missR);
+					__instance.ThrowDebugText("\n\nmissR: " + missR);
 
 					//Log.Message($"missR_b : {missR}");
 
