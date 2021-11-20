@@ -86,6 +86,7 @@
     <Compile Include="amor\ArmorUtility.cs" />
     <Compile Include="shot\yyShotReport.cs" />
     <Compile Include="Harmony\HarmonyPatches.cs" />
+    <Compile Include="loadout\PawnColumnWorker_CarryAmmo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="AlienRace">
