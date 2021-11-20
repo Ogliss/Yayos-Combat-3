@@ -27,9 +27,11 @@
 		<defaultThingDef>yy_ammo_industrial_fire</defaultThingDef>
 	</InventoryStockGroupDef>
 
+<!--
 	<InventoryStockGroupDef ParentName="YY_AmmoBase">
 		<defName>yy_ammo3</defName>
 		<defaultThingDef>yy_ammo_industrial_emp</defaultThingDef>
 	</InventoryStockGroupDef> 
+-->
   
 </Defs>

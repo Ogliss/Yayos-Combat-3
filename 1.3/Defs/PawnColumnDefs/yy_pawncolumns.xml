@@ -15,11 +15,13 @@
 		<sortable>true</sortable>
 	</PawnColumnDef>
 
+<!--
 	<PawnColumnDef>
 		<defName>yy_ammo3</defName>
 		<label>ammo 3</label>
 		<workerClass>yayoCombat.PawnColumnWorker_CarryAmmo</workerClass>
 		<sortable>true</sortable>
 	</PawnColumnDef> 
+-->
   
 </Defs>
