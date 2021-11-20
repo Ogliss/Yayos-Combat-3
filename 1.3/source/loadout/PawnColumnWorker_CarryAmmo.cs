@@ -15,38 +15,42 @@ namespace yayoCombat
 		{
 			if (pawn.inventoryStock != null)
 			{
-				float num = rect.width - 4f;
-				int num2 = Mathf.FloorToInt(num * 0.333333343f);
-				float x = rect.x;
-
 				// lazy way for finding the appropiate def: just named them the same
-				InventoryStockGroupDef group = DefDatabase<InventoryStockGroupDef>.AllDefs.First((def) => def.defName == this.def.defName); 
+				InventoryStockGroupDef group = DefDatabase<InventoryStockGroupDef>.AllDefs.First((def) => def.defName == this.def.defName);
 
-				// Type
-				Widgets.Dropdown(
-					new Rect(
-						x, 
-						rect.y + 2f, 
-						num2, 
-						rect.height - 4f),
-					pawn, 
-					(Pawn p) => p.inventoryStock.GetDesiredThingForGroup(group), 
-					(Pawn p) => GenerateThingButtons(p, group), 
-					buttonIcon: pawn.inventoryStock.GetDesiredThingForGroup(group).uiIcon, 
-					paintable: true);
+				int localI = 0;
+				if (yayoCombat.ammo)
+				{
+					float num = rect.width - 4f;
+					int num2 = Mathf.FloorToInt(num * 0.333333343f);
+					float x = rect.x;
 
-				// Amount
-				string buffer = null;
-				int localI = pawn.inventoryStock.GetDesiredCountForGroup(group);
-				Widgets.TextFieldNumeric(
-					new Rect(
-						x + num2 + 4f,
-						rect.y + 2f,
-						Mathf.FloorToInt(num * (2f / 3f)),
-						rect.height - 4f),
-					ref localI, 
-					ref buffer,
-					max: 1e3f);
+					// Type
+					Widgets.Dropdown(
+						new Rect(
+							x,
+							rect.y + 2f,
+							num2,
+							rect.height - 4f),
+						pawn,
+						(Pawn p) => p.inventoryStock.GetDesiredThingForGroup(group),
+						(Pawn p) => GenerateThingButtons(p, group),
+						buttonIcon: pawn.inventoryStock.GetDesiredThingForGroup(group).uiIcon,
+						paintable: true);
+
+					// Amount
+					string buffer = null;
+					localI = pawn.inventoryStock.GetDesiredCountForGroup(group);
+					Widgets.TextFieldNumeric(
+						new Rect(
+							x + num2 + 4f,
+							rect.y + 2f,
+							Mathf.FloorToInt(num * (2f / 3f)),
+							rect.height - 4f),
+						ref localI,
+						ref buffer,
+						max: 1e3f);
+				}
 				pawn.inventoryStock.SetCountForGroup(group, localI);
 			}
 		}
@@ -68,17 +72,17 @@ namespace yayoCombat
 
 		public override int GetMinWidth(PawnTable table)
 		{
-			return Mathf.Max(base.GetMinWidth(table), Mathf.CeilToInt(54f));
+			return yayoCombat.ammo ? Mathf.Max(base.GetMinWidth(table), Mathf.CeilToInt(54f)) : 0;
 		}
 
 		public override int GetOptimalWidth(PawnTable table)
 		{
-			return Mathf.Clamp(Mathf.CeilToInt(104f), GetMinWidth(table), GetMaxWidth(table));
+			return yayoCombat.ammo ? Mathf.Clamp(Mathf.CeilToInt(104f), GetMinWidth(table), GetMaxWidth(table)) : 0;
 		}
 
 		public override int GetMinHeaderHeight(PawnTable table)
 		{
-			return Mathf.Max(base.GetMinHeaderHeight(table), 65);
+			return yayoCombat.ammo ? Mathf.Max(base.GetMinHeaderHeight(table), 65) : 0;
 		}
 
 		public override int Compare(Pawn a, Pawn b)
