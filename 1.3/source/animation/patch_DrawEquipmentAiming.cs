@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using RimWorld;
-using UnityEngine;
+﻿using UnityEngine;
 using HarmonyLib;
 using Verse;
-using System.Linq;
+using RimWorld;
 
 namespace yayoCombat
 {
@@ -120,8 +117,7 @@ namespace yayoCombat
             {
                 matSingle = eq.Graphic.MatSingle;
             }
-            mesh = mesh == MeshPool.plane10 ? MeshPool.GridPlane(eq.def.graphicData.drawSize) : MeshPool.GridPlaneFlip(eq.def.graphicData.drawSize);
-            Graphics.DrawMesh(mesh, drawLoc, Quaternion.AngleAxis(num, Vector3.up), matSingle, 0);
+            Graphics.DrawMesh(PawnRenderer_override.GetMesh(mesh, eq, aimAngle, pawn), PawnRenderer_override.GetDrawOffset(drawLoc, eq, pawn), Quaternion.AngleAxis(num, Vector3.up), matSingle, 0);
             return false;
         }
     }

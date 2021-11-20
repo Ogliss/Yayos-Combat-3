@@ -83,7 +83,7 @@ namespace yayoCombat
             {
                 Pawn p = cp.Wearer;
 
-                if (p.RaceProps.IsMechanoid)
+                if (p.RaceProps.IsMechanoid || !p.RaceProps.Humanlike)
                 {
                     Thing ammo = ThingMaker.MakeThing(cp.AmmoDef);
                     ammo.stackCount = cp.MaxAmmoNeeded(true);

@@ -78,19 +78,8 @@ namespace yayoCombat
                 FinalizeAndAddInjury(pawn, num, dinfo, result);
                 return false;
             }
-            /*
-            foreach (string str in Traverse.Create(__instance).Methods())
-            {
-                Log.Message(str);
-            }
-            */
-
-            //Traverse.Create(__instance).Method("ApplySpecialEffectsToPart", new object[] { pawn, num, dinfo, result });
-
-            AccessTools.Method(typeof(DamageWorker_AddInjury), "ApplySpecialEffectsToPart").Invoke(__instance, new object[] { pawn, num, dinfo, result });
-
+            __instance.ApplySpecialEffectsToPart(pawn, num, dinfo, result);
             return false;
-			
 		}
 
 

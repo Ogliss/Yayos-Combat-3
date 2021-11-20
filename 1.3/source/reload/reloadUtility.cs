@@ -82,7 +82,6 @@ namespace yayoCombat
             if (cp.RemainingCharges <= 0)
             {
                 Pawn p = cp.Wearer;
-
                 List<Thing> ar_inven = p.inventory.innerContainer.ToList<Thing>();
                 List<Thing> ar_ammo = new List<Thing>();
                 for (int i = 0; i < ar_inven.Count; i++)
@@ -92,7 +91,13 @@ namespace yayoCombat
                         ar_ammo.Add(ar_inven[i]);
                     }
                 }
-
+                if (ar_ammo.Count == 0 && !p.RaceProps.Humanlike && yayoCombat.refillMechAmmo)
+                {
+                    Thing ammo = ThingMaker.MakeThing(cp.AmmoDef);
+                    ammo.stackCount = cp.MaxAmmoNeeded(true);
+                    p.inventory.innerContainer.TryAdd(ammo);
+                    ar_ammo.Add(ammo);
+                }
                 if (ar_ammo.Count > 0)
                 {
                     List<Thing> ar_dropThing = new List<Thing>();

@@ -10,6 +10,9 @@
     <AssemblyName>yayoCombat</AssemblyName>
     <TargetFramework>net472</TargetFramework>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,10 +38,6 @@
     <Prefer32Bit>false</Prefer32Bit>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-  </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Remove="MigrationBackup\**" />
     <EmbeddedResource Remove="_DLL\**" />
@@ -46,9 +45,9 @@
     <None Remove="_DLL\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.3.3066" GeneratePathProperty="true" />
+    <PackageReference Include="Krafs.Rimworld.Ref" Version="1.3.3102" GeneratePathProperty="true" />
     <PackageReference Include="Lib.Harmony">
-      <Version>2.1.0</Version>
+      <Version>2.1.1</Version>
     </PackageReference>
     <PackageReference Include="UnlimitedHugs.Rimworld.HugsLib">
       <Version>9.0.0</Version>
@@ -89,6 +88,10 @@
     <Compile Include="Harmony\HarmonyPatches.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="AlienRace">
+      <HintPath>..\..\..\..\..\..\workshop\content\294100\839005762\1.3\Assemblies\AlienRace.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="DualWield">
       <HintPath>_DLL\publicized_assemblies\DualWield_publicized.dll</HintPath>
       <Private>false</Private>

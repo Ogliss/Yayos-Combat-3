@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using HarmonyLib;
 using Verse;
+using RimWorld;
 
 namespace yayoCombat
 {
@@ -90,7 +91,7 @@ namespace yayoCombat
             {
                 matSingle = eq.Graphic.MatSingle;
             }
-            Graphics.DrawMesh(mesh, drawLoc, Quaternion.AngleAxis(num, Vector3.up), matSingle, 0);
+            Graphics.DrawMesh(GetMesh(mesh, eq, aimAngle, pawn), GetDrawOffset(drawLoc, eq, pawn), Quaternion.AngleAxis(num, Vector3.up), matSingle, 0);
             return;
         }
 
@@ -553,6 +554,121 @@ namespace yayoCombat
                 }
             }
             return false;
+        }
+        public static Vector3 GetDrawOffset(Vector3 drawLoc, Thing thing, Pawn pawn)
+        {
+            Vector3 offset = Vector3.zero;
+            /*
+            if (thing.def.graphicData is EquippedGraphicData data)
+            {
+                offset = data.EquippedOffsetAt(pawn.Rotation, pawn.story.bodyType);
+                offset.y = thing.def.graphicData.DrawOffsetForRot(pawn.Rotation).y;
+
+                return drawLoc + offset;
+            }
+            */
+            if (thing.def.apparel?.wornGraphicData != null)
+            {
+                offset = thing.def.apparel.wornGraphicData.OffsetAt(pawn.Rotation, pawn.story.bodyType);
+                offset.y = thing.def.graphicData.DrawOffsetForRot(pawn.Rotation).y;
+                return drawLoc + offset;
+            }
+            return drawLoc + thing.def.graphicData.DrawOffsetForRot(pawn.Rotation);
+        }
+
+        public static Mesh GetMesh(Mesh mesh, Thing thing, float aimAngle, Pawn pawn)
+        {
+            Vector2 s;
+            if (pawn.RaceProps.Humanlike)
+            {
+                if (yayoCombat.using_AlienRaces)
+                {
+                    Vector2 v = AlienRaceUtility.AlienRacesPatch(pawn, thing);
+                    float f = Mathf.Max(v.x, v.y);
+                    s = new Vector2(thing.def.graphicData.drawSize.x * f, thing.def.graphicData.drawSize.y * f);
+                }
+                else
+                {
+                    s = new Vector2(thing.def.graphicData.drawSize.x, thing.def.graphicData.drawSize.y);
+                }
+            }
+            else
+            {
+                Vector2 v = pawn.ageTracker.CurKindLifeStage.bodyGraphicData.drawSize;
+                s = new Vector2(thing.def.graphicData.drawSize.x + v.x / 10, thing.def.graphicData.drawSize.y + v.y / 10);
+            }
+            if (thing.def.graphicData.drawSize == Vector2.one) return mesh;
+            if (aimAngle > 200f && aimAngle < 340f)
+            {
+                mesh = MeshPool.GridPlaneFlip(s);
+            }
+            else
+            {
+                mesh = MeshPool.GridPlane(s);
+            }
+            return mesh;
+
+        }
+        public static Vector3 OffsetAt(this WornGraphicData graphicData, Rot4 facing, BodyTypeDef bodyType = null)
+        {
+            WornGraphicDirectionData wornGraphicDirectionData = default(WornGraphicDirectionData);
+            switch (facing.AsInt)
+            {
+                case 0:
+                    wornGraphicDirectionData = graphicData.north;
+                    break;
+                case 1:
+                    wornGraphicDirectionData = graphicData.east;
+                    break;
+                case 2:
+                    wornGraphicDirectionData = graphicData.south;
+                    break;
+                case 3:
+                    wornGraphicDirectionData = graphicData.west;
+                    break;
+            }
+            Vector2 vector = wornGraphicDirectionData.offset;
+            if (bodyType != null)
+            {
+                if (bodyType == BodyTypeDefOf.Male)
+                {
+                    vector += wornGraphicDirectionData.male.offset;
+                }
+                else if (bodyType == BodyTypeDefOf.Female)
+                {
+                    vector += wornGraphicDirectionData.female.offset;
+                }
+                else if (bodyType == BodyTypeDefOf.Thin)
+                {
+                    vector += wornGraphicDirectionData.thin.offset;
+                }
+                else if (bodyType == BodyTypeDefOf.Hulk)
+                {
+                    vector += wornGraphicDirectionData.hulk.offset;
+                }
+                else if (bodyType == BodyTypeDefOf.Fat)
+                {
+                    vector += wornGraphicDirectionData.fat.offset;
+                }
+            }
+            return new Vector3(vector.x, 0, vector.y);
+        }
+    }
+    public class AlienRaceUtility
+    {
+        public static Vector2 AlienRacesPatch(Pawn pawn, Thing eq)
+        {
+            AlienRace.ThingDef_AlienRace alienDef = pawn.def as AlienRace.ThingDef_AlienRace;
+            Vector2 s;
+            if (alienDef != null)
+            {
+                s = alienDef.alienRace.generalSettings.alienPartGenerator.customDrawSize;
+            }
+            else
+            {
+                s = new Vector3(eq.def.graphicData.drawSize.x, 1f, eq.def.graphicData.drawSize.y);
+            }
+            return s;
         }
     }
 }

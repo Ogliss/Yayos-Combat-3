@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Defs>
+	<ThingDef ParentName="ResourceBase" Name="YCAmmoBase" Abstract="True">
+		<graphicData>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<stackLimit>250</stackLimit>
+		<statBases>
+			<MaxHitPoints>20</MaxHitPoints>
+			<Mass>0.05</Mass>
+			<Flammability>1</Flammability>
+			<DeteriorationRate>1.0</DeteriorationRate>
+		</statBases>
+		<thingCategories>
+			<li>yy_ammo_category</li>
+		</thingCategories>
+		<tradeTags>
+			<li>Ammo</li>
+		</tradeTags>
+		<healthAffectsPrice>false</healthAffectsPrice>
+		<soundInteract>Metal_Drop</soundInteract>
+		<soundDrop>Standard_Drop</soundDrop>
+	</ThingDef>
+	
+	<!-- Primitive -->
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_primitive</defName>
+		<label>primitive ammo</label>
+		<description>Ammunition used in primitive and medieval ranged weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_primitive</texPath>
+		</graphicData>
+		<techLevel>Neolithic</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_primitive_fire</defName>
+		<label>primitive explosive ammo</label>
+		<description>Ammunition used in primitive and medieval ranged weapons. Used for explosion, flame, and smoke damage type weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_primitive_fire</texPath>
+		</graphicData>
+		<techLevel>Neolithic</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_primitive_emp</defName>
+		<label>primitive special ammo</label>
+		<description>Ammunition used in primitive and medieval ranged weapons. Used for special weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_primitive_emp</texPath>
+		</graphicData>
+		<techLevel>Neolithic</techLevel>
+	</ThingDef>
+	
+	<!-- Industrial -->
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_industrial</defName>
+		<label>industrial ammo</label>
+		<description>Ammunition used for long-range weapons in the industrial tech.</description>
+		<graphicData>
+			<texPath>yy_ammo_industrial</texPath>
+		</graphicData>
+		<techLevel>Industrial</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_industrial_fire</defName>
+		<label>industrial explosive ammo</label>
+		<description>Ammunition used for long-range weapons in the industrial tech. Used for explosion, flame, and smoke damage type weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_industrial_fire</texPath>
+		</graphicData>
+		<techLevel>Industrial</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_industrial_emp</defName>
+		<label>industrial special ammo</label>
+		<description>Ammunition used for long-range weapons in the industrial tech. Used for special weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_industrial_emp</texPath>
+		</graphicData>
+		<techLevel>Industrial</techLevel>
+	</ThingDef>
+	
+	<!-- Spacer -->
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_spacer</defName>
+		<label>spacer ammo</label>
+		<description>Ammunition used for long-range weapons in the spacer tech.</description>
+		<graphicData>
+			<texPath>yy_ammo_spacer</texPath>
+		</graphicData>
+		<techLevel>Spacer</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_spacer_fire</defName>
+		<label>spacer explosive ammo</label>
+		<description>Ammunition used for long-range weapons in the spacer tech. Used for explosion, flame, and smoke damage type weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_spacer_fire</texPath>
+		</graphicData>
+		<techLevel>Spacer</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="YCAmmoBase">
+		<defName>yy_ammo_spacer_emp</defName>
+		<label>spacer special ammo</label>
+		<description>Ammunition used for long-range weapons in the spacer tech. Used for special weapons.</description>
+		<graphicData>
+			<texPath>yy_ammo_spacer_emp</texPath>
+		</graphicData>
+		<techLevel>Spacer</techLevel>
+	</ThingDef>
+	
+	<ThingDef ParentName="UnfinishedBase">
+		<defName>yy_ammo_primitive_unfinish</defName>
+		<label>unfinished ammo</label>
+		<description>An unfinished ammo.</description>
+		<statBases>
+			<Flammability>0.5</Flammability>
+		</statBases>
+		<graphicData>
+			<texPath>Things/Item/Unfinished/UnfinishedWeapon</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+			<color>(133,97,67)</color>
+		</graphicData>
+		<stuffCategories Inherit="false" />
+	</ThingDef>
+	
+	<ThingDef ParentName="UnfinishedBase">
+		<defName>yy_ammo_industrial_unfinish</defName>
+		<label>unfinished ammo</label>
+		<description>An unfinished ammo.</description>
+		<statBases>
+			<Flammability>0.5</Flammability>
+		</statBases>
+		<graphicData>
+			<texPath>Things/Item/Unfinished/UnfinishedBelt</texPath>
+			<graphicClass>Graphic_Single</graphicClass>
+		</graphicData>
+		<stuffCategories Inherit="false" />
+	</ThingDef>
+</Defs>

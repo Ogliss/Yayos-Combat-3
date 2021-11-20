@@ -25,6 +25,8 @@ namespace yayoCombat
         }
 
 
+        public static bool enabled_AlienRaces = ModsConfig.ActiveModsInLoadOrder.Any((ModMetaData m) => m.PackageIdPlayerFacing == "erdelf.HumanoidAlienRaces");
+
         private SettingHandle<bool> refillMechAmmoSetting;
         public static bool refillMechAmmo = true;
 

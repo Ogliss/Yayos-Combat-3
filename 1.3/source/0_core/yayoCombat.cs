@@ -15,6 +15,7 @@ namespace yayoCombat
     {
         public override string ModIdentifier => "YayoCombat3";
         public static bool using_dualWeld = false;
+        public static bool using_AlienRaces = false;
 
         static yayoCombat()
         {
@@ -22,8 +23,14 @@ namespace yayoCombat
             {
                 using_dualWeld = true;
             }
+            if (ModsConfig.ActiveModsInLoadOrder.Any(mod => mod.PackageId.ToLower().Contains("erdelf.HumanoidAlienRaces".ToLower())))
+            {
+                using_AlienRaces = true;
+            }
         }
 
+        private SettingHandle<bool> refillMechAmmoSetting;
+        public static bool refillMechAmmo = true;
 
         private SettingHandle<bool> ammoSetting;
         public static bool ammo = false;
@@ -119,6 +126,9 @@ namespace yayoCombat
         {
             ammoSetting = Settings.GetHandle<bool>("ammo", "ammo_title".Translate(), "ammo_desc".Translate(), false);
             ammo = ammoSetting.Value;
+
+            refillMechAmmoSetting = Settings.GetHandle<bool>("refillMechAmmo", "refillMechAmmo_title".Translate(), "refillMechAmmo_desc".Translate(), true);
+            refillMechAmmo = refillMechAmmoSetting.Value;
 
             ammoGenSetting = Settings.GetHandle<float>("ammoGen", "ammoGen_title".Translate(), "ammoGen_desc".Translate(), 1f);
             ammoGen = ammoGenSetting.Value;
