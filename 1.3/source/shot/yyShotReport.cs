@@ -129,13 +129,19 @@ namespace yayoCombat
 					else
 					{
 						// turret
-						factorSkill = (float)yayoCombat.baseSkill / 20f;
+						float stat = __instance.Caster.GetStatValue(StatDefOf.ShootingAccuracyTurret, true);
+						if (stat != StatDefOf.ShootingAccuracyTurret.defaultBaseValue)
+							// it's the same stat in vanilla: the chance to miss per cell.
+							factorSkill = StatDefOf.ShootingAccuracyPawn.postProcessCurve.EvaluateInverted(stat) / 20f;
+						else
+							factorSkill = (float)yayoCombat.baseSkill / 20f;
 						factorStat = 1f - (factorStat * factorSkill);
 					}
 
+					__instance.ThrowDebugText("factorSkill: " + factorSkill * 20f + "\nStat factor: " + factorStat);
 
 
-                    float dist = (currentTarget.Cell - __instance.caster.Position).LengthHorizontal;
+					float dist = (currentTarget.Cell - __instance.caster.Position).LengthHorizontal;
 
                     float factorEquip = 1f - __instance.verbProps.GetHitChanceFactor(__instance.EquipmentSource, dist);
 
@@ -182,6 +188,8 @@ namespace yayoCombat
 
 					missR = missR * 0.95f + 0.05f;
 					Mathf.Clamp(missR, 0.05f, 0.95f);
+
+					__instance.ThrowDebugText("\n\nmissR: " + missR);
 
 					//Log.Message($"missR_b : {missR}");
 
