@@ -8,7 +8,7 @@
   <ammoFull>Nothing to reload</ammoFull>
   
   <refillMechAmmo_title># Refill Mech Ammo</refillMechAmmo_title>
-  <refillMechAmmo_desc>Refill mech weapons automatically, so that they do not run out of ammo.</refillMechAmmo_desc>
+  <refillMechAmmo_desc>Prevents mechs from running out of ammo by automatically refilling their weapons without requiring ammo.</refillMechAmmo_desc>
 
   <ammo_title># Use of ammunition system</ammo_title>
   <ammo_desc>Modified to require ammo when using all ranged weapons.\n\nGame restart required</ammo_desc>
@@ -23,7 +23,10 @@
   <enemyAmmo_desc>The amount of ammo for the weapon of enemies and NPCs, and the amount of ammo for the player's starting item.</enemyAmmo_desc>
   
   <supplyAmmoDist_title>       - Ammo supply distance when draft</supplyAmmoDist_title>
-  <supplyAmmoDist_desc>If all of the ammo is exhausted in the draft state, the ammo within a distance of X is used for reloading.-1 : Turn off function</supplyAmmoDist_desc>
+  <supplyAmmoDist_desc>If all of the ammo is exhausted in the draft state, the ammo within a distance of X is used for reloading. -1 : Turn off function</supplyAmmoDist_desc>
+  
+  <showReloadWeaponGizmo_title># Show 'Reload Weapon' Gizmo</showReloadWeaponGizmo_title>
+  <showReloadWeaponGizmo_desc>Activate the "Reload Weapon" gizmo for selected drafted pawns using weapons which require ammo.</showReloadWeaponGizmo_desc>
   
   
   

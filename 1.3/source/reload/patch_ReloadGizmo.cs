@@ -22,9 +22,9 @@ namespace yayoCombat
 		[HarmonyPostfix]
 		static IEnumerable<Gizmo> Postfix(IEnumerable<Gizmo> __result, Pawn_DraftController __instance)
 		{
-			var pawn = __instance?.pawn;
 			if (yayoCombat.ammo
-				&& pawn != null
+				&& yayoCombat.showReloadWeaponGizmo
+				&& __instance?.pawn is Pawn pawn
 				&& pawn.Faction?.IsPlayer == true
 				&& pawn.Drafted
 				&& !pawn.WorkTagIsDisabled(WorkTags.Violent))

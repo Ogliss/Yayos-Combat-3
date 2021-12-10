@@ -48,6 +48,9 @@ namespace yayoCombat
         private SettingHandle<int> supplyAmmoDistSetting;
         public static int supplyAmmoDist = 4;
 
+        private SettingHandle<bool> showReloadWeaponGizmoSetting;
+        public static bool showReloadWeaponGizmo = true;
+
 
 
         private SettingHandle<bool> advAniSetting;
@@ -142,6 +145,9 @@ namespace yayoCombat
 
             supplyAmmoDistSetting = Settings.GetHandle<int>("supplyAmmoDist", "supplyAmmoDist_title".Translate(), "supplyAmmoDist_desc".Translate(), 4);
             supplyAmmoDist = supplyAmmoDistSetting.Value;
+
+            showReloadWeaponGizmoSetting = Settings.GetHandle("showReloadButton", "showReloadWeaponGizmo_title".Translate(), "showReloadWeaponGizmo_desc".Translate(), true);
+            showReloadWeaponGizmo = showReloadWeaponGizmoSetting.Value;
 
             advAniSetting = Settings.GetHandle<bool>("advAni", "advAni_title".Translate(), "advAni_desc".Translate(), true);
             advAni = advAniSetting.Value;
