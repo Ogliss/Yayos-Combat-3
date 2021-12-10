@@ -23,7 +23,8 @@ namespace yayoCombat
 		static IEnumerable<Gizmo> Postfix(IEnumerable<Gizmo> __result, Pawn_DraftController __instance)
 		{
 			var pawn = __instance?.pawn;
-			if (pawn != null
+			if (yayoCombat.ammo
+				&& pawn != null
 				&& pawn.Faction?.IsPlayer == true
 				&& pawn.Drafted
 				&& !pawn.WorkTagIsDisabled(WorkTags.Violent))
@@ -33,12 +34,26 @@ namespace yayoCombat
 					CompReloadable comp = thing.TryGetComp<CompReloadable>();
 					if (comp != null)
 					{
+						bool disabled = false;
+						string disableReason = null;
+
+						if (pawn.Downed) // should actually never happen, since pawns can't be drafted when downed
+						{
+							disabled = true;
+							disableReason = "pawnDowned".Translate();
+						}
+						else if (comp.RemainingCharges >= comp.MaxCharges)
+						{
+							disabled = true;
+							disableReason = "ammoFull".Translate();
+						}
+
 						yield return new Command_Action()
 						{
-							defaultLabel = "reload_Weapon".Translate(),
-							defaultDesc = "reload_WeaponDesc".Translate(),
-							disabled = pawn.Downed,
-							disabledReason = "pawn_downed".Translate(),
+							defaultLabel = "reloadWeapon_title".Translate(),
+							defaultDesc = "reloadWeapon_desc".Translate(),
+							disabled = disabled,
+							disabledReason = disableReason,
 							icon = GizmoTexture.AmmoReload,
 
 							action = () => reloadUtility.tryAutoReload(comp, true),
