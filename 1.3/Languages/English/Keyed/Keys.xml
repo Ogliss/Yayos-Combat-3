@@ -5,7 +5,7 @@
   <reloadWeapon_title>Reload Weapon</reloadWeapon_title>
   <reloadWeapon_desc>Will use carried ammo or will look for ammo on the ground.</reloadWeapon_desc>
   <pawnDowned>Cannot reload weapon when downed</pawnDowned>
-  <ammoFull>Ammo already at capacity</ammoFull>
+  <ammoFull>Nothing to reload</ammoFull>
   
   <refillMechAmmo_title># Refill Mech Ammo</refillMechAmmo_title>
   <refillMechAmmo_desc>Refill mech weapons automatically, so that they do not run out of ammo.</refillMechAmmo_desc>
