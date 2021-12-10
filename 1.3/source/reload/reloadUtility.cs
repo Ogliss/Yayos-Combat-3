@@ -77,9 +77,9 @@ namespace yayoCombat
             return null;
         }
 
-        static public void tryAutoReload(CompReloadable cp)
+        static public void tryAutoReload(CompReloadable cp, bool forced = false)
         {
-            if (cp.RemainingCharges <= 0)
+            if (cp.RemainingCharges <= 0 || forced && cp.RemainingCharges < cp.MaxCharges)
             {
                 Pawn p = cp.Wearer;
                 List<Thing> ar_inven = p.inventory.innerContainer.ToList<Thing>();

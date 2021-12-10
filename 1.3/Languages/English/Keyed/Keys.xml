@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <LanguageData>
   <eject_Ammo>Eject Ammo</eject_Ammo>
+  
+  <reload_Weapon>Reload Weapon</reload_Weapon>
+  <reload_WeaponDesc>Will use carried ammo or will look for ammo on the ground.</reload_WeaponDesc>
+  <pawn_downed>Cannot reload weapon when downed</pawn_downed>
 
   <ammo_title># Use of ammunition system</ammo_title>
   <ammo_desc>Modified to require ammo when using all ranged weapons.\n\nGame restart required</ammo_desc>
