@@ -13,6 +13,5 @@ namespace yayoCombat
         {
             yayoCombat.patchDef1();
         }
-
     }
 }
