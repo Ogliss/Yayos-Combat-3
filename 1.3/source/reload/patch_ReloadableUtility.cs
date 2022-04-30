@@ -521,103 +521,48 @@ namespace yayoCombat
 
 
 	// 적 생성 시 탄약 보유 설정
-	[HarmonyPatch(typeof(PawnWeaponGenerator), "TryGenerateWeaponFor")]
-	internal class Patch_PawnWeaponGenerator_TryGenerateWeaponFor
+	[HarmonyPatch(typeof(PawnGenerator), "GenerateGearFor")]
+	internal class Patch_PawnGenerator_GenerateGearFor
 	{
-		private static FieldInfo f_allWeaponPairs = AccessTools.Field(typeof(PawnWeaponGenerator), "allWeaponPairs");
-		private static AccessTools.FieldRef<List<ThingStuffPair>> s_allWeaponPairs = AccessTools.StaticFieldRefAccess<List<ThingStuffPair>>(f_allWeaponPairs);
-		private static FieldInfo f_workingWeapons = AccessTools.Field(typeof(PawnWeaponGenerator), "workingWeapons");
-		private static AccessTools.FieldRef<List<ThingStuffPair>> s_workingWeapons = AccessTools.StaticFieldRefAccess<List<ThingStuffPair>>(f_workingWeapons);
-
-		[HarmonyPrefix]
-		[HarmonyPriority(0)]
-		static bool Prefix(Pawn pawn, PawnGenerationRequest request)
+		[HarmonyPostfix]
+		[HarmonyPriority(Priority.Last)]
+		static void Postfix(Pawn pawn)
 		{
-			if (!yayoCombat.ammo) return true;
+			if (!yayoCombat.ammo) 
+				return;
 
-
-			List<ThingStuffPair> allWeaponPairs = s_allWeaponPairs.Invoke();
-			List<ThingStuffPair> workingWeapons = s_workingWeapons.Invoke();
-
-			workingWeapons.Clear();
-
-			if (pawn.kindDef.weaponTags == null || pawn.kindDef.weaponTags.Count == 0 || (!pawn.RaceProps.ToolUser || !pawn.health.capacities.CapableOf(PawnCapacityDefOf.Manipulation)) || pawn.WorkTagIsDisabled(WorkTags.Violent))
-				return false;
-
-			float randomInRange = pawn.kindDef.weaponMoney.RandomInRange;
-			for (int index = 0; index < allWeaponPairs.Count; ++index)
+			var allWeaponsComps = new List<CompReloadable>();
+			// get all generated equipped weapons
+			if (pawn?.equipment?.AllEquipmentListForReading != null)
 			{
-				ThingStuffPair w = allWeaponPairs[index];
-				if ((double)w.Price <= (double)randomInRange && (pawn.kindDef.weaponTags == null || pawn.kindDef.weaponTags.Any<string>((Predicate<string>)(tag => w.thing.weaponTags.Contains(tag)))) && ((double)w.thing.generateAllowChance >= 1.0 || Rand.ChanceSeeded(w.thing.generateAllowChance, pawn.thingIDNumber ^ (int)w.thing.shortHash ^ 28554824)))
-					workingWeapons.Add(w);
-			}
-
-			if (workingWeapons.Count == 0)
-				return false;
-			pawn.equipment.DestroyAllEquipment();
-			ThingStuffPair result;
-
-			if (workingWeapons.TryRandomElementByWeight<ThingStuffPair>((Func<ThingStuffPair, float>)(w => w.Commonality * w.Price), out result))
-			{
-				ThingWithComps thingWithComps = (ThingWithComps)ThingMaker.MakeThing(result.thing, result.stuff);
-
-				// yayo
-				if (pawn != null)
+				foreach (var thing in pawn.equipment.AllEquipmentListForReading)
 				{
-					foreach (ThingComp c in from comp in thingWithComps.AllComps
-											where
-												comp != null
-												 && comp is CompReloadable
-											select comp)
-					{
-						CompReloadable comp = c as CompReloadable;
-						if (comp != null)
-						{
-							if (pawn.Faction != null && pawn.Faction.IsPlayer)
-							{
-								// 정착민일 경우
-								Traverse.Create(comp).Field("remainingCharges").SetValue(Mathf.Min(comp.MaxCharges, Mathf.RoundToInt((float)comp.MaxCharges * yayoCombat.s_enemyAmmo * Rand.Range(0.7f, 1.3f))));
-							}
-							else
-							{
-								// 정착민이 아닐경우 총알 보유량
-								if(yayoCombat.s_enemyAmmo <= 1f)
-								{
-									// 최대치 제한
-									Traverse.Create(comp).Field("remainingCharges").SetValue(Mathf.Min(comp.MaxCharges, Mathf.RoundToInt((float)comp.MaxCharges * yayoCombat.s_enemyAmmo * Rand.Range(0.7f, 1.3f))));
-								}
-								else
-								{
-									// 최대치 초과 가능
-									Traverse.Create(comp).Field("remainingCharges").SetValue(Mathf.RoundToInt((float)comp.MaxCharges * yayoCombat.s_enemyAmmo * Rand.Range(0.7f, 1.3f)));
-									/*
-									Map m = pawn.Map;
-									Thing thing = ThingMaker.MakeThing(comp.AmmoDef);
-									thing.stackCount = Rand.Range(30, 30);
-									*/
-									//pawn.inventory.innerContainer.AddItem(thing);
-									//GenPlace.TryPlaceThing(thing, this.parent.InteractionCell, m, ThingPlaceMode.Near);
-									
-
-								}
-								
-							}
-							
-						}
-
-					}
+					var comp = thing.GetComp<CompReloadable>();
+					if (comp != null && thing.def.IsWeapon)
+						allWeaponsComps.Add(comp);
 				}
-
-				PawnGenerator.PostProcessGeneratedGear((Thing)thingWithComps, pawn);
-				if ((double)Rand.Value < ((double)request.BiocodeWeaponChance > 0.0 ? (double)request.BiocodeWeaponChance : (double)pawn.kindDef.biocodeWeaponChance))
-					thingWithComps.TryGetComp<CompBiocodable>()?.CodeFor(pawn);
-				pawn.equipment.AddEquipment(thingWithComps);
-
 			}
-			workingWeapons.Clear();
+			// get all generated weapons in inventory
+			if (pawn?.inventory?.innerContainer != null)
+			{
+				foreach (var thing in pawn.inventory.innerContainer)
+				{
+					var comp = thing.TryGetComp<CompReloadable>();
+					if (comp != null && thing.def.IsWeapon)
+						allWeaponsComps.Add(comp);
+				}
+			}
 
-			return false;
-
+			// add ammo to all weapons found
+			foreach (var comp in allWeaponsComps)
+			{
+				int charges;
+				if (yayoCombat.s_enemyAmmo <= 1f || pawn.Faction != null && pawn.Faction.IsPlayer)
+					charges = Mathf.Min(comp.MaxCharges, Mathf.RoundToInt(comp.MaxCharges * yayoCombat.s_enemyAmmo * Rand.Range(0.7f, 1.3f)));
+				else
+					charges = Mathf.RoundToInt(comp.MaxCharges * yayoCombat.s_enemyAmmo * Rand.Range(0.7f, 1.3f));
+				comp.remainingCharges = charges;
+			}
 		}
 	}
 
@@ -636,33 +581,14 @@ namespace yayoCombat
 		{
 			if (yayoCombat.ammo && __instance.parent.def.IsWeapon)
 			{
-
-
 				if (GenTicks.TicksGame <= 5)
 				{
-					foreach (ThingComp c in from comp in __instance.parent.AllComps
-											where
-												comp != null
-												 && comp is CompReloadable
-											select comp)
-					{
-						CompReloadable comp = c as CompReloadable;
-						if (comp != null)
-						{
-							// 시작아이템 총알 보유량
-							Traverse.Create(comp).Field("remainingCharges").SetValue(Mathf.RoundToInt((float)comp.MaxCharges * yayoCombat.s_enemyAmmo));
-						}
-
-					}
+					__instance.remainingCharges = Mathf.RoundToInt(__instance.MaxCharges * yayoCombat.s_enemyAmmo);
 				}
 				else
 				{
-					// 생산된 아이템 총알 보유량
-					Traverse.Create(__instance).Field("remainingCharges").SetValue(0);
+					__instance.remainingCharges = 0;
 				}
-
-
-
 			}
 		}
 	}
@@ -691,7 +617,6 @@ namespace yayoCombat
 							if (second.def == comp.Props.ammoDef)
 								ar_tmp.Add(new Pair<CompReloadable, Thing>(comp, second));
 						}
-						comp = (CompReloadable)null;
 					}
 				}
 			}
@@ -712,7 +637,6 @@ namespace yayoCombat
 							if (second.def == comp.Props.ammoDef)
 								ar_tmp.Add(new Pair<CompReloadable, Thing>(comp, second));
 						}
-						comp = (CompReloadable)null;
 					}
 				}
 			}
