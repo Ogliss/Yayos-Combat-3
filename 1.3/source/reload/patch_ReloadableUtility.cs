@@ -15,9 +15,10 @@ namespace yayoCombat
 	// Adjustment of weapon price according to ammunition: 
 	// In the past, the price of ammunition was subtracted from the price of existing weapons. Changed it to add ammo price to the original price
 	[HarmonyPatch(typeof(StatPart_ReloadMarketValue), "TransformAndExplain")]
-	public class Patch_StatPart_ReloadMarketValue_TransformAndExplain
+	internal class Patch_StatPart_ReloadMarketValue_TransformAndExplain
 	{
-		public static bool Prefix(StatRequest req, ref float val, StringBuilder explanation)
+		[HarmonyPrefix]
+		static bool Prefix(StatRequest req, ref float val, StringBuilder explanation)
 		{
 			if (req != null && req.Thing != null && req.Thing.def != null)
 
@@ -45,9 +46,9 @@ namespace yayoCombat
 	// 탄약 카테고리 보이기
 	// Show ammo categories
 	[HarmonyPatch(typeof(ThingFilter), "SetFromPreset")]
-	internal class patch_ThingFilter_SetFromPreset
+	internal class Patch_ThingFilter_SetFromPreset
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ThingFilter __instance, StorageSettingsPreset preset)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -63,8 +64,9 @@ namespace yayoCombat
 	// 소집상태에서 탄약0일 장전 시도하기
 	// Attempt to reload ammo for day 0 while in muster
 	[HarmonyPatch(typeof(Pawn), "Tick")]
-	internal class patch_Pawn_TickRare
+	internal class Patch_Pawn_TickRare
 	{
+		[HarmonyPostfix]
 		[HarmonyPriority(0)]
 		static void Postfix(Pawn __instance)
 		{
@@ -92,9 +94,9 @@ namespace yayoCombat
 	// 적 사망 시 무기에서 탄약 아이템 분리
 	// Detach ammo items from weapons when an enemy dies
 	[HarmonyPatch(typeof(Pawn_EquipmentTracker), "DropAllEquipment")]
-	internal class patch_Pawn_EquipmentTracker_DropAllEquipment
+	internal class Patch_Pawn_EquipmentTracker_DropAllEquipment
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(Pawn_EquipmentTracker __instance, ThingOwner<ThingWithComps> ___equipment, IntVec3 pos, bool forbid = true)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -123,9 +125,9 @@ namespace yayoCombat
 	// 게임 로드 시 comp_reloadable.verbTracker로 인한 중복 에러 방지
 	// Avoid duplicate errors caused by comp_reloadable.verbTracker when loading games
 	[HarmonyPatch(typeof(CompReloadable), "PostExposeData")]
-	internal class patch_CompReloadable_PostExposeData
+	internal class Patch_CompReloadable_PostExposeData
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(CompReloadable __instance, ref int ___remainingCharges)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -158,8 +160,9 @@ namespace yayoCombat
 	// Right-click eject ammunition menu
 
 	[HarmonyPatch(typeof(ThingWithComps), "GetFloatMenuOptions")]
-	internal class patch_ThingWithComps_GetFloatMenuOptions
+	internal class Patch_ThingWithComps_GetFloatMenuOptions
 	{
+		[HarmonyPostfix]
 		[HarmonyPriority(0)]
 		static void Postfix(ref IEnumerable<FloatMenuOption> __result, ThingWithComps __instance, Pawn selPawn)
 		{
@@ -181,9 +184,9 @@ namespace yayoCombat
 
 	// 터렛 무기 재장전 콤프 제거
 	[HarmonyPatch(typeof(Building_TurretGun), "MakeGun")]
-	internal class patch_Building_TurretGun_MakeGun
+	internal class Patch_Building_TurretGun_MakeGun
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(Building_TurretGun __instance)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -217,9 +220,9 @@ namespace yayoCombat
 
 	// 상인 소지품에 탄약 생성
 	[HarmonyPatch(typeof(ThingSetMaker_TraderStock), "Generate")]
-	internal class patch_ThingSetMaker_TraderStock_Generate
+	internal class Patch_ThingSetMaker_TraderStock_Generate
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ThingSetMaker_TraderStock __instance, ThingSetMakerParams parms, List<Thing> outThings)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -259,7 +262,7 @@ namespace yayoCombat
 				{
 					tech = makingFaction.def.techLevel;
 				}
-				Thing t = new Thing();
+				Thing t;
 
 				float amount = 300f;
 				float min = 0.4f;
@@ -327,15 +330,9 @@ namespace yayoCombat
 
 				}
 				
-
-				
-
-				
 			}
 
 			return false;
-
-
 		}
 	}
 
@@ -343,9 +340,9 @@ namespace yayoCombat
 
 	// 상인이 탄약 거래 가능하도록 허용
 	[HarmonyPatch(typeof(TraderKindDef), "WillTrade")]
-	internal class patch_TraderKindDef_WillTrade
+	internal class Patch_TraderKindDef_WillTrade
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref bool __result, TraderKindDef __instance, ThingDef td)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -360,25 +357,21 @@ namespace yayoCombat
 			{
 				return true;
 			}
-
-
 		}
 	}
 
 	// 추가적인 탄약표시 기즈모 설정
 
 	[HarmonyPatch(typeof(CompReloadable), "CreateVerbTargetCommand")]
-	internal class patch_CompReloadable_CreateVerbTargetCommand
+	internal class Patch_CompReloadable_CreateVerbTargetCommand
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref Command_Reloadable __result, CompReloadable __instance, Thing gear, Verb verb)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			verb.caster = __instance.Wearer;
-
-			if (gear.def.IsWeapon)
+			if (yayoCombat.ammo && gear.def.IsWeapon)
 			{
+				verb.caster = __instance.Wearer;
+
 				Command_Reloadable commandReloadable = new Command_Reloadable(__instance);
 				commandReloadable.defaultDesc = gear.def.description;
 				//commandReloadable.hotKey = __instance.Props.hotKey;
@@ -409,45 +402,16 @@ namespace yayoCombat
 					commandReloadable.Disable(__instance.DisabledReason(__instance.MinAmmoNeeded(false), __instance.MaxAmmoNeeded(false)));
 
 				__result = commandReloadable;
-				return false;
-			}
-			else
-			{
-				Command_Reloadable commandReloadable = new Command_Reloadable(__instance);
-				commandReloadable.defaultDesc = gear.def.description;
-				commandReloadable.hotKey = __instance.Props.hotKey;
-				commandReloadable.defaultLabel = verb.verbProps.label;
-				commandReloadable.verb = verb;
-				if (verb.verbProps.defaultProjectile != null && verb.verbProps.commandIcon == null)
-				{
-					commandReloadable.icon = verb.verbProps.defaultProjectile.uiIcon;
-					commandReloadable.iconAngle = verb.verbProps.defaultProjectile.uiIconAngle;
-					commandReloadable.iconOffset = verb.verbProps.defaultProjectile.uiIconOffset;
-					commandReloadable.overrideColor = new Color?(verb.verbProps.defaultProjectile.graphicData.color);
-				}
-				else
-				{
-					commandReloadable.icon = verb.UIIcon != BaseContent.BadTex ? verb.UIIcon : gear.def.uiIcon;
-					commandReloadable.iconAngle = gear.def.uiIconAngle;
-					commandReloadable.iconOffset = gear.def.uiIconOffset;
-					commandReloadable.defaultIconColor = gear.DrawColor;
-				}
-				if (!__instance.Wearer.IsColonistPlayerControlled)
-					commandReloadable.Disable();
-				else if (verb.verbProps.violent && __instance.Wearer.WorkTagIsDisabled(WorkTags.Violent))
-					commandReloadable.Disable((string)("IsIncapableOfViolenceLower".Translate(__instance.Wearer.LabelShort, __instance.Wearer).CapitalizeFirst() + "."));
-				else if (!__instance.CanBeUsed)
-					commandReloadable.Disable(__instance.DisabledReason(__instance.MinAmmoNeeded(false), __instance.MaxAmmoNeeded(false)));
 
-				__result = commandReloadable;
 				return false;
 			}
+			return true;
 		}
 	}
 
 	// 추가적인 탄약표시 기즈모 생성
 	[HarmonyPatch(typeof(Pawn_EquipmentTracker), "GetGizmos")]
-	internal class patch_Pawn_EquipmentTracker_GetGizmos
+	internal class Patch_Pawn_EquipmentTracker_GetGizmos
 	{
 		[HarmonyPostfix]
 		static IEnumerable<Gizmo> Postfix(IEnumerable<Gizmo> __result, Pawn_EquipmentTracker __instance)
@@ -479,9 +443,9 @@ namespace yayoCombat
 
 	// 남은 탄약이 0 일경우 사냥 중지, 탄약 줍기 ai
 	[HarmonyPatch(typeof(CompReloadable), "UsedOnce")]
-	internal class patch_CompReloadable_UsedOnce
+	internal class Patch_CompReloadable_UsedOnce
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(CompReloadable __instance)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -526,9 +490,9 @@ namespace yayoCombat
 
 	// 사냥을 위한 무기 보유 여부를 탄약과 함께 계산
 	[HarmonyPatch(typeof(WorkGiver_HunterHunt), "HasHuntingWeapon")]
-	internal class patch_WorkGiver_HasHuntingWeapon
+	internal class Patch_WorkGiver_HasHuntingWeapon
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref bool __result, Pawn p)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -558,13 +522,14 @@ namespace yayoCombat
 
 	// 적 생성 시 탄약 보유 설정
 	[HarmonyPatch(typeof(PawnWeaponGenerator), "TryGenerateWeaponFor")]
-	internal class patch_PawnWeaponGenerator_TryGenerateWeaponFor
+	internal class Patch_PawnWeaponGenerator_TryGenerateWeaponFor
 	{
 		private static FieldInfo f_allWeaponPairs = AccessTools.Field(typeof(PawnWeaponGenerator), "allWeaponPairs");
 		private static AccessTools.FieldRef<List<ThingStuffPair>> s_allWeaponPairs = AccessTools.StaticFieldRefAccess<List<ThingStuffPair>>(f_allWeaponPairs);
 		private static FieldInfo f_workingWeapons = AccessTools.Field(typeof(PawnWeaponGenerator), "workingWeapons");
 		private static AccessTools.FieldRef<List<ThingStuffPair>> s_workingWeapons = AccessTools.StaticFieldRefAccess<List<ThingStuffPair>>(f_workingWeapons);
 
+		[HarmonyPrefix]
 		[HarmonyPriority(0)]
 		static bool Prefix(Pawn pawn, PawnGenerationRequest request)
 		{
@@ -663,8 +628,9 @@ namespace yayoCombat
 
 	// 아이템 생성 시 기본 탄약 수
 	[HarmonyPatch(typeof(CompReloadable), "PostPostMake")]
-	internal class patch_CompReloadable_PostPostMake
+	internal class Patch_CompReloadable_PostPostMake
 	{
+		[HarmonyPostfix]
 		[HarmonyPriority(0)]
 		static void Postfix(CompReloadable __instance)
 		{
@@ -703,9 +669,9 @@ namespace yayoCombat
 
 
 	[HarmonyPatch(typeof(ReloadableUtility), "FindPotentiallyReloadableGear")]
-	internal class patch_ReloadableUtility_FindPotentiallyReloadableGear
+	internal class Patch_ReloadableUtility_FindPotentiallyReloadableGear
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref IEnumerable<Pair<CompReloadable, Thing>> __result, Pawn pawn, List<Thing> potentialAmmo)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -763,9 +729,9 @@ namespace yayoCombat
 
 
 	[HarmonyPatch(typeof(ReloadableUtility), "FindSomeReloadableComponent")]
-	internal class patch_ReloadableUtility_FindSomeReloadableComponent
+	internal class Patch_ReloadableUtility_FindSomeReloadableComponent
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref CompReloadable __result, Pawn pawn, bool allowForcedReload)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -785,9 +751,9 @@ namespace yayoCombat
 	}
 
 	[HarmonyPatch(typeof(ReloadableUtility), "WearerOf")]
-	internal class patch_ReloadableUtility_WearerOf
+	internal class Patch_ReloadableUtility_WearerOf
 	{
-		[HarmonyPostfix]
+		[HarmonyPrefix]
 		static bool Prefix(ref Pawn __result, CompReloadable comp)
 		{
 			if (!yayoCombat.ammo) return true;
@@ -797,8 +763,4 @@ namespace yayoCombat
 			return false;
 		}
 	}
-
-
-
-
 }
