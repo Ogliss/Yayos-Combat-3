@@ -40,11 +40,14 @@ namespace yayoCombat
 
         }
 
-        internal static void TryThingEjectAmmoDirect(Thing w, bool forbidden = false)
+        internal static void TryThingEjectAmmoDirect(Thing w, bool forbidden = false, Pawn pawn = null)
         {
-            if (!w.def.IsWeapon) return;
+            if (!w.def.IsWeapon) 
+                return;
             
-            if (w.TryGetComp<CompReloadable>() == null) return;
+            if (w.TryGetComp<CompReloadable>() == null) 
+                return;
+
             CompReloadable cp = w.TryGetComp<CompReloadable>();
             int n = 0;
 
@@ -53,15 +56,18 @@ namespace yayoCombat
                 cp.UsedOnce();
                 n++;
             }
-            Thing t = null;
 
             while (n > 0)
             {
-                t = ThingMaker.MakeThing(cp.AmmoDef);
+                Thing t = ThingMaker.MakeThing(cp.AmmoDef);
                 t.stackCount = Mathf.Min(t.def.stackLimit, n) * cp.Props.ammoCountPerCharge;
-                if(forbidden) t.SetForbidden(true);
+                t.SetForbidden(forbidden);
                 n -= t.stackCount;
-                GenPlace.TryPlaceThing(t, w.Position, w.Map, ThingPlaceMode.Near);
+
+                if (pawn != null)
+                    GenPlace.TryPlaceThing(t, pawn.Position, pawn.Map, ThingPlaceMode.Near);
+                else
+                    GenPlace.TryPlaceThing(t, w.Position, w.Map, ThingPlaceMode.Near);
             }
         }
 
