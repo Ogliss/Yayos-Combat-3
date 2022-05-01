@@ -8,6 +8,7 @@ using System.Linq;
 using Verse.AI;
 using System.Reflection;
 using System.Text;
+using System.Reflection.Emit;
 
 namespace yayoCombat
 {
@@ -202,122 +203,173 @@ namespace yayoCombat
 	}
 
 
-
 	// 상인 소지품에 탄약 생성
 	[HarmonyPatch(typeof(ThingSetMaker_TraderStock), "Generate")]
 	internal class Patch_ThingSetMaker_TraderStock_Generate
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ThingSetMaker_TraderStock __instance, ThingSetMakerParams parms, List<Thing> outThings)
+		[HarmonyTranspiler]
+		static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			bool hasStockGenerator_WeaponsRanged = false;
-
-			TraderKindDef trader = parms.traderDef ?? DefDatabase<TraderKindDef>.AllDefsListForReading.RandomElement<TraderKindDef>();
-
-			if (trader != null && trader.defName == "Empire_Caravan_TributeCollector") return true; // 제국 수집 상인
-
-			Faction makingFaction = parms.makingFaction;
-			int forTile = !parms.tile.HasValue ? (Find.AnyPlayerHomeMap == null ? (Find.CurrentMap == null ? -1 : Find.CurrentMap.Tile) : Find.AnyPlayerHomeMap.Tile) : parms.tile.Value;
-			for (int index = 0; index < trader.stockGenerators.Count; ++index)
+			CodeInstruction returnInstruction = null;
+			// Original code
+			foreach (var instruction in instructions)
 			{
-				if(trader.stockGenerators[index] is StockGenerator_WeaponsRanged)
-				{
-					hasStockGenerator_WeaponsRanged = true;
-				}
-				foreach (Thing thing in trader.stockGenerators[index].GenerateThings(forTile, parms.makingFaction))
-				{
-					if (!thing.def.tradeability.TraderCanSell())
-					{
-						Log.Error(trader.ToString() + " generated carrying " + (object)thing + " which can't be sold by traders. Ignoring...");
-					}
-					else
-					{
-						thing.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(thing);
-					}
-				}
+				if (instruction.opcode == OpCodes.Ret)
+					returnInstruction = instruction;
+				else
+					yield return instruction;
 			}
 
-			if (hasStockGenerator_WeaponsRanged || Rand.Value <= 0.2f)
+			// New code
+			yield return new CodeInstruction(OpCodes.Ldloc_0);
+			yield return new CodeInstruction(OpCodes.Ldloc_1);
+			yield return new CodeInstruction(OpCodes.Ldloc_2);
+			yield return new CodeInstruction(OpCodes.Ldarg_2);
+			yield return new CodeInstruction(OpCodes.Call, typeof(Patch_ThingSetMaker_TraderStock_Generate).GetMethod(nameof(Patch_ThingSetMaker_TraderStock_Generate.AddAmmo), BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic));
+			yield return returnInstruction;
+		}
+
+		static void AddAmmo(TraderKindDef traderKindDef, Faction makingFaction, int forTile, List<Thing> outThings)
+		{
+			var isWeaponsTrader = traderKindDef.stockGenerators.FirstOrDefault(s => s is StockGenerator_WeaponsRanged) != null;
+			var isExoticTrader = !isWeaponsTrader && traderKindDef.stockGenerators.FirstOrDefault(s => s is StockGenerator_Tag tag && tag.tradeTag == "ExoticMisc") != null;
+			if (traderKindDef.defName.ToLower().Contains("bulkgoods")
+				|| isWeaponsTrader
+				|| isExoticTrader
+				|| Rand.Value <= 0.33f)
 			{
 				TechLevel tech = TechLevel.Spacer;
-				if (makingFaction != null && makingFaction.def != null)
-				{
+				if (makingFaction?.def != null)
 					tech = makingFaction.def.techLevel;
-				}
-				Thing t;
-
-				float amount = 300f;
-				float min = 0.4f;
-				float max = 1.6f;
-
 
 				if (tech >= TechLevel.Neolithic)
 				{
+					float amount = 400f;
+					float min = 0.25f;
+					float max = 1.50f;
+
+					Thing thing;
+
 					// 원시 이상
-					if ((tech >= TechLevel.Neolithic && tech <= TechLevel.Medieval) || Rand.Value <= 0.3f)
+					var rnd = Rand.Value;
+					if (!isExoticTrader
+						&& (tech >= TechLevel.Neolithic && tech <= TechLevel.Medieval	// 100% for Neolithic & Medieval
+						||  tech <= TechLevel.Industrial && rnd <= 0.2f					//  20% for Industrial
+						||  rnd <= 0.1f))                                               //  10% for Post-Industrial
 					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_primitive"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
+						var primitiveAmount = amount;
+						if (tech > TechLevel.Medieval)
+							primitiveAmount *= 0.5f;
+
+						var count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * primitiveAmount);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_primitive"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * primitiveAmount * 0.40f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_primitive_fire"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * primitiveAmount * 0.25f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_primitive_emp"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
 					}
 
 
 					// 산업 이상
-					if (tech >= TechLevel.Industrial || Rand.Value <= 0.2f)
+					rnd = Rand.Value;
+					if (!isExoticTrader
+						&& (tech == TechLevel.Industrial								// 100% for Industrial
+						||  tech > TechLevel.Industrial && rnd <= 0.8f					//  80% for Post-Industrial
+						||  rnd <= 0.2f))                                               //  20% for Pre-Industrial
 					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
-					}
-					if (tech >= TechLevel.Industrial || Rand.Value <= 0.2f)
-					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial_fire"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount * 0.5f);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
-					}
-					if (tech >= TechLevel.Industrial || Rand.Value <= 0.2f)
-					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial_emp"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount * 0.25f);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
+						var industrialAmount = amount;
+						if (tech < TechLevel.Industrial)
+							industrialAmount /= (int)TechLevel.Industrial - (int)tech;
+
+						var count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * industrialAmount);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * industrialAmount * 0.40f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial_fire"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * industrialAmount * 0.25f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_industrial_emp"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
 					}
 
 
 					// 우주 이상
-					if (tech >= TechLevel.Spacer || Rand.Value <= 0.2f)
+					rnd = Rand.Value;
+					if (isExoticTrader
+						|| tech >= TechLevel.Spacer										// 100% for Spacer & Post-Spacer
+						|| tech == TechLevel.Industrial && rnd <= 0.5f					//  50% for Industrial
+						|| rnd <= 0.1f)													//  10% for Pre-Industrial
 					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
-					}
-					if (tech >= TechLevel.Spacer || Rand.Value <= 0.2f)
-					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer_fire"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount * 0.5f);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
-					}
-					if (tech >= TechLevel.Spacer || Rand.Value <= 0.2f)
-					{
-						t = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer_emp"));
-						t.stackCount = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * amount * 0.25f);
-						t.PostGeneratedForTrader(trader, forTile, makingFaction);
-						outThings.Add(t);
-					}
+						var spacerAmount = amount;
+						if (tech < TechLevel.Spacer)
+							spacerAmount /= (int)TechLevel.Spacer - (int)tech;
 
+						var count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * spacerAmount);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * spacerAmount * 0.40f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer_fire"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+
+						count = Mathf.RoundToInt(Rand.Range(min, max) * yayoCombat.ammoGen * spacerAmount * 0.25f);
+						if (count > 20)
+						{
+							thing = ThingMaker.MakeThing(ThingDef.Named("yy_ammo_spacer_emp"));
+							thing.stackCount = count;
+							thing.PostGeneratedForTrader(traderKindDef, forTile, makingFaction);
+							outThings.Add(thing);
+						}
+					}
 				}
-				
 			}
-
-			return false;
 		}
 	}
 
@@ -327,26 +379,19 @@ namespace yayoCombat
 	[HarmonyPatch(typeof(TraderKindDef), "WillTrade")]
 	internal class Patch_TraderKindDef_WillTrade
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ref bool __result, TraderKindDef __instance, ThingDef td)
+		[HarmonyPostfix]
+		static bool Postfix(bool __result, TraderKindDef __instance, ThingDef td)
 		{
-			if (!yayoCombat.ammo) return true;
-			if (__instance.defName == "Empire_Caravan_TributeCollector") return true; // 제국 수집 상인
-
-			if (td.tradeTags != null && td.tradeTags.Contains("Ammo"))
+			if (yayoCombat.ammo && __instance.defName != "Empire_Caravan_TributeCollector")
 			{
-				__result = true;
-				return false;
+				if (td.tradeTags?.Contains("Ammo") == true)
+					__result = true;
 			}
-			else
-			{
-				return true;
-			}
+			return __result;
 		}
 	}
 
 	// 추가적인 탄약표시 기즈모 설정
-
 	[HarmonyPatch(typeof(CompReloadable), "CreateVerbTargetCommand")]
 	internal class Patch_CompReloadable_CreateVerbTargetCommand
 	{
@@ -424,37 +469,15 @@ namespace yayoCombat
 	}
 
 
-
-
 	// 남은 탄약이 0 일경우 사냥 중지, 탄약 줍기 ai
 	[HarmonyPatch(typeof(CompReloadable), "UsedOnce")]
 	internal class Patch_CompReloadable_UsedOnce
 	{
-		[HarmonyPrefix]
-		static bool Prefix(CompReloadable __instance)
+		[HarmonyPostfix]
+		static void Postfix(CompReloadable __instance)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			int remainingCharges0 = __instance.RemainingCharges;
-			if (remainingCharges0 > 0)
-			{
-				Traverse.Create(__instance).Field("remainingCharges").SetValue(remainingCharges0 - 1);
-			}
-			//if (__instance.VerbTracker.PrimaryVerb.caster == null) return false;
-
-			
-			if (!__instance.Props.destroyOnEmpty || __instance.RemainingCharges != 0 || __instance.parent.Destroyed)
-			{
-				
-			}
-			else
-			{
-				__instance.parent.Destroy(DestroyMode.Vanish);
-			}
-
-			//
-
-			if (__instance.Wearer == null) return false;
+			if (!yayoCombat.ammo || __instance.Wearer == null) 
+				return;
 
 			// 남은 탄약이 0 일경우 게임튕김 방지를 위해 사냥 중지
 			if (__instance.RemainingCharges == 0)
@@ -465,11 +488,8 @@ namespace yayoCombat
 				}
 			}
 
-
 			// 알아서 장전 ai
 			reloadUtility.tryAutoReload(__instance);
-
-			return false;
 		}
 	}
 
@@ -477,29 +497,16 @@ namespace yayoCombat
 	[HarmonyPatch(typeof(WorkGiver_HunterHunt), "HasHuntingWeapon")]
 	internal class Patch_WorkGiver_HasHuntingWeapon
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ref bool __result, Pawn p)
+		[HarmonyPostfix]
+		static bool Postfix(bool __result, Pawn p)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			if (p.equipment.Primary != null && p.equipment.Primary.def.IsRangedWeapon && (p.equipment.PrimaryEq.PrimaryVerb.HarmsHealth() && !p.equipment.PrimaryEq.PrimaryVerb.UsesExplosiveProjectiles()))
+			if (yayoCombat.ammo && __result)
 			{
-				if (p.equipment.Primary.GetComp<CompReloadable>() != null)
-				{
-					__result = p.equipment.Primary.GetComp<CompReloadable>().CanBeUsed;
-
-				}
-				else
-				{
-					__result = true;
-				}
+				var comp = p.equipment.Primary.GetComp<CompReloadable>();
+				if (comp != null)
+					__result = comp.CanBeUsed;
 			}
-			else
-			{
-				__result = false;
-			}
-
-			return false;
+			return __result;
 		}
 	}
 
@@ -582,94 +589,69 @@ namespace yayoCombat
 	[HarmonyPatch(typeof(ReloadableUtility), "FindPotentiallyReloadableGear")]
 	internal class Patch_ReloadableUtility_FindPotentiallyReloadableGear
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ref IEnumerable<Pair<CompReloadable, Thing>> __result, Pawn pawn, List<Thing> potentialAmmo)
+		[HarmonyPostfix]
+		static IEnumerable<Pair<CompReloadable, Thing>> Postfix(IEnumerable<Pair<CompReloadable, Thing>> __result, Pawn pawn, List<Thing> potentialAmmo)
 		{
-			if (!yayoCombat.ammo) return true;
+			foreach(var pair in __result)
+				yield return pair;
 
-			List<Pair<CompReloadable, Thing>> ar_tmp = new List<Pair<CompReloadable, Thing>>();
-			if (pawn.apparel != null)
-			{
-				List<Apparel> worn = pawn.apparel.WornApparel;
-				for (int i = 0; i < worn.Count; ++i)
-				{
-					CompReloadable comp = worn[i].TryGetComp<CompReloadable>();
-					if (comp?.AmmoDef != null)
-					{
-						for (int j = 0; j < potentialAmmo.Count; ++j)
-						{
-							Thing second = potentialAmmo[j];
-							if (second.def == comp.Props.ammoDef)
-								ar_tmp.Add(new Pair<CompReloadable, Thing>(comp, second));
-						}
-					}
-				}
-			}
+			if (!yayoCombat.ammo)
+				yield break;
 
-			// yayo
-			// 무기
 			if (pawn.equipment != null)
 			{
-				List<ThingWithComps> worn = pawn.equipment.AllEquipmentListForReading;
-				for (int i = 0; i < worn.Count; ++i)
+				foreach (var thing in pawn.equipment.AllEquipmentListForReading)
 				{
-					CompReloadable comp = worn[i].TryGetComp<CompReloadable>();
+					var comp = thing.TryGetComp<CompReloadable>();
 					if (comp?.AmmoDef != null)
 					{
-						for (int j = 0; j < potentialAmmo.Count; ++j)
+						foreach (var ammoThing in potentialAmmo)
 						{
-							Thing second = potentialAmmo[j];
-							if (second.def == comp.Props.ammoDef)
-								ar_tmp.Add(new Pair<CompReloadable, Thing>(comp, second));
+							if (ammoThing?.def == comp.Props.ammoDef)
+								yield return new Pair<CompReloadable, Thing>(comp, ammoThing);
 						}
 					}
 				}
 			}
-
-			__result = ar_tmp;
-			return false;
 		}
 	}
-
-
-	
-	
-	
 
 
 	[HarmonyPatch(typeof(ReloadableUtility), "FindSomeReloadableComponent")]
 	internal class Patch_ReloadableUtility_FindSomeReloadableComponent
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ref CompReloadable __result, Pawn pawn, bool allowForcedReload)
+		[HarmonyPostfix]
+		static CompReloadable Postfix(CompReloadable __result, Pawn pawn, bool allowForcedReload)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			List<ThingWithComps> ar_thing = pawn.equipment.AllEquipmentListForReading;
-			for (int i = 0; i < ar_thing.Count; i++)
+			if (yayoCombat.ammo && __result == null)
 			{
-				CompReloadable compReloadable = ar_thing[i].TryGetComp<CompReloadable>();
-				if (compReloadable != null && compReloadable.NeedsReload(allowForcedReload))
+				foreach (var thing in pawn.equipment.AllEquipmentListForReading)
 				{
-					__result = compReloadable;
-					return false;
+					var compReloadable = thing.TryGetComp<CompReloadable>();
+					if (compReloadable?.NeedsReload(allowForcedReload) == true)
+					{
+						__result = compReloadable;
+						break;
+					}
 				}
 			}
-			return true;
+			return __result;
 		}
 	}
 
 	[HarmonyPatch(typeof(ReloadableUtility), "WearerOf")]
 	internal class Patch_ReloadableUtility_WearerOf
 	{
-		[HarmonyPrefix]
-		static bool Prefix(ref Pawn __result, CompReloadable comp)
+		[HarmonyPostfix]
+		static Pawn Postfix(Pawn __result, CompReloadable comp)
 		{
-			if (!yayoCombat.ammo) return true;
-
-			// comp.ParentHolder is Pawn_ApparelTracker parentHolder ? parentHolder.pawn : (Pawn) null;
-			__result = comp.ParentHolder is Pawn_EquipmentTracker parentHolder ? parentHolder.pawn : comp.ParentHolder is Pawn_ApparelTracker parentHolder2 ? parentHolder2.pawn : (Pawn)null;
-			return false;
+			if (yayoCombat.ammo && __result == null)
+			{
+				if (comp.ParentHolder is Pawn_EquipmentTracker equipmentTracker)
+					__result = equipmentTracker.pawn;
+				// could also check "is Pawn_InventoryTracker inventoryTracker", might cause problems though?
+			}
+			return __result;
 		}
 	}
 }
